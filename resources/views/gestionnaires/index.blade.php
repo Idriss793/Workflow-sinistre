@@ -1,392 +1,258 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <title>Accueil</title>
-    <style>
-        .listForm {
-            width: 100%;
-            background: #fff;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        .nav-list{
-            display: flex;
-            list-style: none;
-            position: relative;
-            padding: 0;
-            margin: 0;
-        }
-        .nav-list li{
-            flex: 1;
-            text-align: center;
-        }
-        .nav-list a{
-            display: block;
-            padding: 15px 0;
-            text-decoration: none;
-            color: #34495e;
-            font-weight: 500;
-            position: relative;
-            transition: color 0.3s;
-        }
+@extends('layouts.app')
+@section('content')
+<style>
+    .img-hover-zoom {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
 
-       
-        .nav-list a:hover {
-            color: #3498db;
-        }
+    .img-hover-zoom:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    }
+</style>
+<div class="container-fluid my-4">
+    <!-- En-tête -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Consultation du sinistre #{{$sinistres->numero_sinistre}}</h2>
+        <span class="badge bg-warning fs-6">{{ $sinistres->statut->lib_statut}}</span>
+    </div>
 
-        /* Barre de soulignement */
-        .underline{
-            position: absolute;
-            bottom: 0;
-            height: 4px;
-            background-color: #3498db;
-            border-radius: 4px;
-            transition: all 0.3s ease;
-        }
-        
-        /* style de l'élément actif */
-        .nav-list a.active {
-            color: #3498db;
-        }
+    <!-- Alert documents manquants -->
+    <div class="alert alert-danger d-flex align-items-start">
+        <i class="fas fa-exclamation-triangle fa-lg me-2 mt-1"></i>
+        <div>
+            <h5 class="alert-heading">Documents manquants</h5>
+            <p class="mb-1">Veuillez fournir les documents suivants pour finaliser le traitement :</p>
+            <ul class="mb-0">
+                <li>Constat amiable d'accident signé</li>
+                <li>Photos des dégâts complets du véhicule</li>
+                <li>Relevé d'informations du permis de conduire</li>
+            </ul>
+        </div>
+    </div>
 
-        /* Contenu pour visualiser le résultat */
-        .content{
-            margin-top: 30px;
-            padding: 20px;
-            background-color: #f8f9fa;
-            border-radius: 8px;
-        }
+    <!-- Onglets Bootstrap -->
+    <ul class="nav nav-tabs" id="sinistreTabs" role="tablist">
+        <li class="nav-item">
+            <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab">
+                Infos Sinistre
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" id="assure-principal-tab" data-bs-toggle="tab" data-bs-target="#assure-principal" type="button" role="tab">
+                Assuré principal
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" id="assure-tiers-tab" data-bs-toggle="tab" data-bs-target="#assure-tiers" type="button" role="tab">
+                Assuré tiers
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" id="documents-tab" data-bs-toggle="tab" data-bs-target="#documents" type="button" role="tab">
+                Documents
+            </button>
+        </li>
+    </ul>
 
-        .content-section{
-            display: none;
-        }
+    <!-- Contenu des onglets -->
+    <div class="tab-content py-4" id="sinistreTabsContent">
 
-        .content-section.active{
-            display:block;
-            animation: fadeIn 0.5s;
-        }
-
-        @keyframes fadeIn {
-            from {opacity:0;}
-            to {opacity: 1;}
-        }
-
-    </style>
-   
-  </head>
-  <body>
-    <div class="container-fluid">
-        <div class="row" style="height: 100vh;">
-            <div class="col-2 col-sm-3 col-xl-2 " style="background-color: #8995ccff;">
-                <div class="sticky-top">
-                    <nav class="navbar border-bottom border-white mb-3" data-bs-theme="dark">
-                        <div class="container-fluid" >
-                            <a class="navbar-brand" href="#">
-                                <i class="fas fa-home"></i><span class="d-none d-sm-inline ms-2">SUNU</span>
-                            </a>
+        <!-- Infos Sinistre -->
+        <div class="tab-pane fade show active" id="info" role="tabpanel">
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between">
+                    <h5 class="mb-0">Informations sur le sinistre</h5>
+                    <span class="badge bg-info fs-6">En cours de traitement</span>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Date du sinistre :</strong><br>{{ \Carbon\Carbon::parse($sinistres->created_at)->translatedFormat('d F Y')}}
                         </div>
-                    </nav>
-                    <nav class="nav flex-column">
-                        <a class="nav-link text-white" style="white-space: nowrap;" href="{{url('declarerSinistre')}}">
-                            <i class="fas fa-plus"></i><span class="d-none d-sm-inline ms-2">Déclarer un sinistre v2</span>
-                        </a>
-                        <a class="nav-link text-white" style="white-space: nowrap;" href="{{url('home')}}">
-                            <i class="fas fa-plus"></i><span class="d-none d-sm-inline ms-2">Déclarer un sinistre</span>
-                        </a>
-                        <a href="{{url('liste_sinistre')}}" class="nav-link text-white" style="white-space: nowrap;" >
-                            <i class="fas fa-list"></i><span class="d-none d-sm-inline ms-2">Consulter un sinistre</span>
-                        </a>
-                        
-                    </nav>
+                        <div class="col-md-6">
+                            <strong>Lieu du sinistre :</strong><br>{{$sinistres->lieu}}
+                        </div>
+                    </div>
+                    <p><strong>Description :</strong><br>{{$sinistres->description}}</p>
+                    <p><strong>Type de sinistre :</strong>{{$sinistres->type_sinistre}}</p>
+                    <p>
+                        <strong>Statut :</strong>
+                        <span class="badge bg-primary">
+                            {{ $sinistres->statut->lib_statut}}
+                        </span>
+                    </p>
                 </div>
             </div>
 
-            <div class="col-10 col-sm-9 col-xl-10 p-0 m-0">
-                <nav class="navbar navbar-expand-lg bg-body-tertiary mb-3 sticky-top">
-                    <div class="container-fluid">
-                        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                                <li class="nav-item">
-                                    <a class="nav-link" href="#">Dashboard</a>
-                                </li>
-                                
-                                <li class="nav-item">
-                                    <a class="nav-link" href="#">Sinistres en cours de traitement</a>
-                                </li>
-                                 <li class="nav-item">
-                                    <a class="nav-link" href="#">Sinistres clôturés</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="#">Rapports</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="#">Paramètres</a>
-                                </li>
-                            </ul>
-                            <form class="d-flex" role="search">
-                                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"/>
-                                <button class="btn btn-outline-success" type="submit">Search</button>
-                            </form>
+            <h5>Photos du sinistre</h5>
+            <div class="row">
+            @foreach($sinistres->documents->whereIn('type_doc', ['photos']) as $document)
+                <div class="col-md-3 mb-3">
+                    <div class="card" >
+                        <img src="{{ asset('storage/' . $document->path) }}"class="card-img-top img-hover-zoom rounded" alt="Image"> 
+                    </div>
+                </div>
+            @endforeach
+        </div>
+        </div>
+
+        <!-- Assuré principal -->
+        
+        <div class="tab-pane fade" id="assure-principal" role="tabpanel">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Assuré principal</h5>
+                </div>
+                <div class="card-body">
+                     @foreach ($sinistres->assurePrincipals as $assure)
+                        <div class="row mb-3">
+                            <div class="col-md-6"><strong>Nom :</strong> {{$assure->nom}}</div>
+                            <div class="col-md-6"><strong>Prénom :</strong> {{$assure->prenom}}</div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6"><strong>Téléphone :</strong> {{$assure->num_tel}}</div>
+                            <div class="col-md-6"><strong>Numéro de police :</strong> {{$assure->num_pol}}</div>
+                        </div>
+                        <p><strong>Matricule :</strong> {{$assure->num_matri}}</p>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+
+        <!-- Assuré tiers -->
+        <div class="tab-pane fade" id="assure-tiers" role="tabpanel">
+            <div class="row g-3">
+                @foreach ($sinistres->assureTiers as $assure_tiers)
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header text-center">
+                                <h6 class="mb-0">Assuré tiers</h6>
+                            </div>
+                        
+                            <div class="card-body">
+                                <p><strong>Nom :</strong> {{$assure_tiers->nom_tiers}}</p>
+                                <p><strong>Prénom :</strong> {{$assure_tiers->prenom_tiers}}</p>
+                                <p><strong>Téléphone :</strong> {{$assure_tiers->num_tel_tiers}}</p>
+                                <p><strong>Numéro de police :</strong> {{$assure_tiers->num_pol_tiers}}</p>
+                                <p><strong>Matricule :</strong> {{$assure_tiers->num_matri_tiers}}</p>
+                            </div>
                         </div>
                     </div>
-                </nav>
-                <h2 class="text-center mb-5">Déclaration d'un sinistre</h2>
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header text-center">
+                                <h6 class="mb-0">Compagnie assurance tiers</h6>
+                            </div>
+                            <div class="card-body">
+                                <p><strong>Compagnie :</strong> {{$assure_tiers->nom_assurance_tiers}}</p>
+                                <p><strong>Localisation :</strong> {{$assure_tiers->contact_assurance_tiers}}</p>
+                               
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+      
 
-                <div class="listForm">
-                    <ul class="nav-list" id="navList">
-                        <li>
-                            <a href="#" class="active" data-index="0">Infos Sinistre</a>
-                        </li>
-                        <li>
-                            <a href="#" data-index="1">Assuré principal</a>
-                        </li>
-                        <li>
-                            <a href="#" data-index="2">Assuré tiers</a>
-                        </li>
-                        <li>
-                            <a href="#" data-index="3">Téléverser un document</a>
-                        </li>
-                    </ul>
-                    <div class="underline" id="underline"></div>
+        <!-- Documents -->
+        <div class="tab-pane fade" id="documents" role="tabpanel">
+            <h5>État des documents</h5>
+            <ul class="list-group mb-4">
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    Photos des dégâts
+                    <i class="fas fa-check-circle text-success"></i>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    Constat amiable signé
+                    <i class="fas fa-times-circle text-danger"></i>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    Copie de la carte grise
+                    <i class="fas fa-check-circle text-success"></i>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    Relevé d'informations permis
+                    <i class="fas fa-times-circle text-danger"></i>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    Devis de réparation
+                    <i class="fas fa-check-circle text-success"></i>
+                </li>
+            </ul>
+
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Documents téléversés</h5>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Nom</th>
+                                <th>Taille</th>
+                                <th>Date</th>
+                                <th class="text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($sinistres->documents as $document)
+                            <tr>
+                                <td>{{$document->type_doc}}</td>
+                                <td>{{$document->nom_fichier}}</td>
+                                <td>{{$document->taille}}</td>
+                                <td>{{$document->created_at}}</td>
+                                <td class="text-center">
+                                    <a href="{{asset('storage/' . $document->path)}}" target="_blank" class="btn btn-sm btn-info">Voir</a>
+                                    <a href="{{asset('storage/' . $document->path)}}" download class="btn btn-sm btn-success">Télécharger</a>
+                                </td>
+                            </tr>
+                            
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
+            </div>
                 
-                <div class="content">
-                    <!-- partie information sinistre -->
-                    <div class="container mt-5">
-                        <div class="row justify-content-left">
-                            <div class="col-md-6 col-lg-5">
-                                <div class="content-section active" id="content-0">
-                                    <h2>Information sur le sinistre</h2>
-                                    <form action="">
-                                        @csrf
-                                         <div class="mb-3">
-                                            <label for="date_sinistre" class="form-label">Date du sinistre</label>
-                                            <input type="date" class="form-control" id="date_sinistre" name="date_sinistre" >
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="Lieu" class="form-label">Lieu du sinistre</label>
-                                            <input type="text" class="form-control" id="lieu" name="lieu" >
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="description" class="form-label">Description</label>
-                                            <textarea class="form-control" id="description" name="description" ></textarea>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="autoSizingSelect" class="form-label">Type de sinistre</label>
-                                            <select class="form-select" id="autoSizingSelect">
-                                                <option selected>Choisir...</option>
-                                                <option value="1">Voiture à voiture</option>
-                                                <option value="2">Voiture à bien</option>
-                                                <option value="3">Voiture à personne</option>
-                                            </select>
-                                        </div>
-                                        
-                                        <div class="mb-3">
-                                            <label for="formFile" class="form-label">Ajouter une image ou une vidéo</label>
-                                            <input class="form-control" type="file" id="formFile">
-                                        </div>
-                                        <div class="mb-3">
-                                            <button type="submit" class="btn btn-primary">Enregistrer</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
+            <!-- Form upload -->
+            <div class="mt-4">
+                @if (session('status'))
+                    <div class="alert alert-success">
+                        {{ session('status') }}
                     </div>
-                    
-                    <!-- partie assuré principale -->
-                    <div class="container mt-0">
-                        <div class="row justify-content-left">
-                            <div class="col-md-6 col-lg-5">
-                                <div class="content-section" id="content-1">
-                                    <h2>Assuré principal</h2>
-                                    <form action="">
-                                        @csrf
-                                        <div class="mb-3">
-                                            <label for="nom" class="form-label">Nom</label>
-                                            <input type="text" class="form-control" id="nom" name="nom">
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="prenom" class="form-label">Prenom</label>
-                                            <input type="text" class="form-control" id="prenom" name="prenom">
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="num_tel" class="form-label">Numéro de téléphone</label>
-                                            <input type="tel" class="form-control" id="num_tel" name="num_tel">
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="num_pol" class="form-label">Numéro de police</label>
-                                            <input type="text" class="form-control" id="num_pol" name="num_pol">
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label for="nom_assurance_tiers" class="form-label">Nom de la compagnie assurance tiers</label>
-                                            <input type="tel" class="form-control" id="nom_assurance_tiers" value="" name="nom_assurance_tiers" required>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label for="contact_assurance_tiers" class="form-label">Contact de l'assurance tiers</label>
-                                            <input type="tel" class="form-control" id="contact_assurance_tiers" value="" name="contact_assurance_tiers" required>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="num_matri" class="form-label">Numéro de matricule de la voiture</label>
-                                            <input type="text" class="form-control" id="num_matri" name="num_matri">
-                                        </div>
-                                        <div class="mb-3">
-                                            <button type="submit" class="btn btn-primary">Enregistrer</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
+                @endif
+                <h5>Ajouter un document</h5>
+                <form method="POST" class="row g-3" enctype="multipart/form-data" action="{{ route('document.store') }}">
+                    @csrf
+                    <input type="hidden" name="sinistre_id" value="{{ $sinistres->id ?? old('sinistre_id') }}">
+                    <div class="col-md-3">
+                        <label for="documentType" class="form-label">Type de document</label>
+                        <select class="form-select" id="documentType" name="type_doc" required>
+                            <option value="" disabled {{ old('type_doc') ? '' : 'selected' }}>Sélectionner...</option>
+                            <option value="constat" {{ old('type_doc') == 'constat' ? 'selected' : '' }}>Constat amiable</option>
+                            <option value="photos" {{ old('type_doc') == 'photos' ? 'selected' : '' }}>Photos</option>
+                            <option value="permis" {{ old('type_doc') == 'permis' ? 'selected' : '' }}>Relevé permis</option>
+                            <option value="carte_grise" {{ old('type_doc') == 'carte_grise' ? 'selected' : '' }}>Carte grise</option>
+                            <option value="devis" {{ old('type_doc') == 'devis' ? 'selected' : '' }}>Devis</option>
+                            <option value="contrat" {{ old('type_doc') == 'contrat' ? 'selected' : '' }}>Contrat Assuré</option>
+                            <option value="autre" {{ old('type_doc') == 'autre' ? 'selected' : '' }}>Autre</option>
+                        </select>
                     </div>
-                    
-                    <!-- partie assuré tiers -->
-                    <div class="container mt-0">
-                        <div class="row justify-content">
-                            <div class="col-md-12">
-                                <div class="content-section" id="content-2">
-                                    <h2 class="text-center mb-4">Assuré & compagnie tiers</h2>
-                                    <form  action="">
-                                        @csrf
-                                       
-                                        <div class="row">
-                                            <div class="col-md-5">
-                                                <p class="fw-bold text-center">Assuré tiers</p>
-                                                <div class="mb-3">
-                                                <label for="nom_tiers" class="form-label">Nom</label>
-                                                <input type="text" class="form-control" id="nom_tiers" name="nom_tiers">
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label for="prenom_tiers" class="form-label">Prenom</label>
-                                                    <input type="text" class="form-control" id="prenom_tiers" name="prenom_tiers">
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label for="num_tel_tiers" class="form-label">Numéro de téléphone</label>
-                                                    <input type="tel" class="form-control" id="num_tel_tiers" name="num_tel_tiers">
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label for="num_pol_tiers" class="form-label">Numéro de police</label>
-                                                    <input type="text" class="form-control" id="num_pol_tiers" name="num_pol_tiers">
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label for="num_matri_tiers" class="form-label">Numéro de matricule de la voiture</label>
-                                                    <input type="text" class="form-control" id="num_matri_tiers" name="num_matri_tiers">
-                                                </div>
-                                            </div>
 
-                                            <div class="col-md-5 ms-auto">
-                                                <p class="fw-bold text-center">Compagnie assurance tiers</p>
-                                                <div class="mb-3">
-                                                <label for="nom_assurance" class="form-label">Nom de la compagnie assurance</label>
-                                                <input type="text" class="form-control" id="nom_assurance" name="nom_assurance">
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label for="lieu_assurance_tiers" class="form-label">Localisation</label>
-                                                    <input type="text" class="form-control" id="lieu_assurance_tiers" name="lieu_assurance_tiers">
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label for="contact" class="form-label">Contact</label>
-                                                    <input type="tel" class="form-control" id="contact" name="contact">
-                                                </div>
-                                                
-                                            </div>
-                                        </div>
-                                        
-                                        
-                                        
-                                        <div class="mb-2 text-center">
-                                            <button type="submit" class="btn btn-primary">Enregistrer</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="col-md-4">
+                        <label for="formFile" class="form-label">Fichier</label>
+                        <input class="form-control" type="file" id="formFile" name="path">
                     </div>
-                    
-                    <!-- Partie document -->
-                    <div class="container mt-0">
-                        <div class="row justify-content-center">
-                            <div >
-                                <div class="content-section" id="content-3">
-                                    <h2>Documents</h2>
-                                    <div class="card-body">
-                                        <table class="table table-stiped table-bordered">
-                                            <thead>
-                                                <tr class="text-center">
-                                                    <th>Type</th>
-                                                    <th>Taille</th>
-                                                    <th>date</th>
-                                                    <th>Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                               
-                                                    <tr>
-                                                        <td>Contrat</td>
-                                                        <td>887 KB</td>
-                                                        <td>03 sept.2025 14:37</td>
-                                                        <td class="text-center">
-                                                            <a href="#" class="btn btn-success">modifier</a>
-                                                            <a href="#" class="btn btn-info">voir</a>
-                                                            <form action="#" class="d-inline" method="POST">
-                                                                @csrf
-                                                               
-                                                                <button type="submit" class="btn btn-danger">supprimer</button>
-                                                            </form>
-                                                        </td>
-                                                    </tr>
-                                             
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="col-md-3">
+                        <label for="nom_fichier" class="form-label">Nom du document</label>
+                        <input class="form-control" type="text" id="nom_fichier" name="nom_fichier" value="">
                     </div>
-                </div>
-               
+                    <div class="col-md-2 d-grid">
+                        <button type="submit" class="btn btn-primary">Ajouter</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const navLinks = document.querySelectorAll('.nav-list a');
-            const underline = document.getElementById('underline');
-            const contentSections = document.querySelectorAll('.content-section');
-                    
-        
-            // Changement d'onglet
-            function changeTab(index) {
-                // Mettre à jour les liens
-                navLinks.forEach(link => link.classList.remove('active'));
-                navLinks[index].classList.add('active');
-                
-                // Mettre à jour le contenu
-                contentSections.forEach(section => section.classList.remove('active'));
-                contentSections[index].classList.add('active');
-                
-                
-            }
-            
-            // Ajouter les événements de clic
-            navLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const index = parseInt(this.getAttribute('data-index'));
-                    changeTab(index);
-                });
-            });
-            
-        
-            
-            // Ajuster la barre de soulignement lors du redimensionnement de la fenêtre
-            window.addEventListener('resize');
-        });
-    </script>
-  </body>
-</html>
+</div>
+@endsection

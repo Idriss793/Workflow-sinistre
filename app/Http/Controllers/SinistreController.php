@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Statuts;
+use App\Models\Document;
 use App\Models\Sinistre;
 use App\Models\AssureTiers;
 use Illuminate\Http\Request;
@@ -14,11 +16,15 @@ class SinistreController  extends Controller
     public function home(Request $request){
         return view('gestionnaires.index');
     }
-    public function listeSinistre(Request $request){
-        return view('gestionnaires.liste_sinistre');
+    public function index(Request $request){
+        return view('gestionnaires.formDeclarationSinistre');
     }
     public function declarerSinistre(Request $request){
         return view('gestionnaires.declarerSinistre');
+    }
+    public function listeSinistre(Request $request){
+        $sinistres = Sinistre::with(['assurePrincipals','statut'])->get();
+        return view('gestionnaires.listeSinistre',compact('sinistres'));
     }
   
 
@@ -42,9 +48,13 @@ class SinistreController  extends Controller
             'contact_assurance_tiers'=> 'nullable|string',
         ]);
 
+        $statut= Statuts::find('1');
+
+
         $Sinistre = Sinistre::create([
             'date_sinistre' => $request -> date_sinistre,
-            'lieu' => $request -> lieu,
+            'lieu' => $request -> lieu, 
+            'statut_id'=> $statut-> id,
             'type_sinistre' => $request -> type_sinistre,
             'description' => $request -> description,
         ]);
@@ -75,8 +85,16 @@ class SinistreController  extends Controller
             'assure_tiers_id' => $Assure_tiers -> id,
             'sinistre_id' => $Sinistre -> id,
         ]);
-        
 
-        return back()->with('status','Sinistre déclarer avec succès');
+        
+        $sinistres = Sinistre::with(['assurePrincipals','statut'])->get();
+
+        return view('gestionnaires.listeSinistre',compact('sinistres'))->with('status','Sinistre déclarer avec succès');
+    }
+
+    public function show(string $id){
+        $sinistres = Sinistre::with(['assureTiers','assurePrincipals','statut','documents'])->findorFail($id);
+       
+        return view('gestionnaires.index',compact('sinistres'));
     }
 }

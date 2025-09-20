@@ -15,4 +15,9 @@ class AssurePrincipal extends Model
         'num_matri',
         'active',
     ];
+
+    public function sinistres()
+    {
+        return $this->belongsToMany(Sinistre::class, 'assure_sinistres', 'assure_id', 'sinistre_id');
+    }
 }

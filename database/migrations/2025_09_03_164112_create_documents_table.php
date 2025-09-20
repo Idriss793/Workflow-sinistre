@@ -19,6 +19,8 @@ return new class extends Migration
         Schema::create('documents', function (Blueprint $table) {
             $table->id();
             $table->string('type_doc')->nullable();
+            $table->string('nom_fichier')->nullable();
+            $table->string('path')->nullable();
             $table->string('taille')->nullable();
             $table->integer('sinistre_id')->nullable();
             $table->integer('user_id')->nullable();

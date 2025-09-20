@@ -15,11 +15,11 @@ return new class extends Migration
     {
         Schema::create('sinistres', function (Blueprint $table) {
             $table->id();
+            $table->string('numero_sinistre')->unique();
             $table->string('date_sinistre')->nullable();
             $table->string('lieu')->nullable();
             $table->text('description')->nullable();
             $table->string('type_sinistre')->nullable();
-            $table->integer('image_id')->nullable();
             $table->integer('user_id')->nullable();
             $table->integer('statut_id')->nullable();
             $table->integer('active')->default('0');

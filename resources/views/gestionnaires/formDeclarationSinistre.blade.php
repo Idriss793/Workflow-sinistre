@@ -1,11 +1,15 @@
 @extends('layouts.app')
 @section('content')
-<div class="main-content" id="mainContent">
+
         
     <div class="container-fluid py-4">
         <div class="row justify-content-center">
             <div class="col-12 col-lg-10 col-xl-8">
-                    
+                @if (session('status'))
+                    <div class="alert alert-success">
+                        {{ session('status') }}
+                    </div>
+                 @endif
                 
                 <div class="d-flex justify-content-center mb-4">
                     <div class="progress-step active">
@@ -31,8 +35,8 @@
                     </div>
                         
                         <div class="card-body p-4">
-                            <form class="needs-validation"  method="POST" action="{{ route('gestionnaire.store')}}" novalidate id="claimForm">
-                            @csrf
+                            <form class="needs-validation" method="POST"  action="{{ route('gestionnaire.store') }}" novalidate >
+                                @csrf
                                 <!-- Assuré principal -->
                                 <div class="mb-4">
                                     <h4 class="text-primary mb-3 pb-2 section-divider">
@@ -189,7 +193,7 @@
                                 </div>
 
                                 <!-- Documents -->
-                                <div class="mb-4">
+                                <!-- <div class="mb-4">
                                     <h4 class="text-primary mb-3 pb-2 section-divider">
                                         <i class="bi bi-paperclip me-2"></i>Documents et Photos
                                     </h4>
@@ -200,7 +204,7 @@
                                         <p class="text-muted">Photos du sinistre, constat amiable, permis de conduire, etc.</p>
                                         <input type="file" class="form-control" id="documents" name="documents[]" multiple accept="image/*,.pdf,.doc,.docx">
                                     </div>
-                                </div>
+                                </div> -->
 
                                 <!-- Actions -->
                                 <div class="d-flex flex-column flex-sm-row gap-3 justify-content-end">
@@ -210,6 +214,7 @@
                                     <button type="submit" class="btn btn-primary">
                                         <i class="bi bi-send me-2"></i>Envoyer la déclaration
                                     </button>
+                                    
                                 </div>
                             </form>
                         </div>
@@ -217,5 +222,5 @@
             </div>
         </div>
     </div>
-</div>
+
 @endsection

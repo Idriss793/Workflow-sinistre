@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Sinistre;
 use Illuminate\Database\Eloquent\Model;
 
 class Document extends Model
@@ -9,11 +10,17 @@ class Document extends Model
     //
     protected $fillable = [
         'type_doc',
+        'nom_fichier',
         'taille',
-        'id_sinistre',
-        'id_user',
-        'id_assure',
-        'id_assure_tiers',
+        'path',
+        'sinistre_id',
+        'user_id',
+        'assure_id',
+        'assure_id_tiers',
         'active',
     ];
+
+    public function sinistre(){
+        return $this->belongsTo(Sinistre::class,'sinistre_id');
+    }
 }

@@ -17,4 +17,9 @@ class AssureTiers extends Model
         'nom_assurance_tiers',
         'active',
     ];
+
+     public function sinistres()
+    {
+        return $this->belongsToMany(Sinistre::class, 'assure_tiers_sinistres', 'assure_tiers_id', 'sinistre_id');
+    }
 }

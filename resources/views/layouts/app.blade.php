@@ -149,10 +149,11 @@
             <button class="btn btn-outline-light me-3" type="button" id="sidebarToggle">
                 <i class="bi bi-list"></i>
             </button>
-            <a class="navbar-brand d-flex align-items-center" href="#">
-                <img src="{{ asset('image/sunu.png') }}" alt="SUNU Assurances" width="50" height="50" class="me-2">
-                <span class="navbar-brand text-white fw-bold fs-4">SUNU Assurances</span>
-            </a>
+             <h2 class="text-white "><i class=" bi-file-medical-alt me-2"></i>Gestion des Sinistres</h2>
+            <button class="btn btn-outline-primary position-relative" data-bs-toggle="modal" data-bs-target="#notificationsModal">
+                <i class="bi bi-bell"></i>
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge" id="notificationCount">0</span>
+            </button>
             <!-- <a class="navbar-brand text-white fw-bold fs-4" href="#">
                 <i class="bi bi-car-front me-2"></i>SUNU Assurance
             </a> -->
@@ -170,33 +171,24 @@
             </h4>
         </div>
         <nav class="nav flex-column">
-            <a class="nav-link py-3 px-4" href="#">
+            <a class="nav-link py-3 px-4" href="{{url('listeSinistre')}}">
                 <i class="bi bi-speedometer2 me-2"></i>Tableau de bord
             </a>
-            <a class="nav-link py-3 px-4 active bg-secondary" href="{{url('declarerSinistre')}}">
+            <a class="nav-link py-3 px-4 " href="{{url('declarerSinistre')}}">
                 <i class="bi bi-exclamation-triangle me-2"></i>Déclarer un sinistre v1
             </a>
-            <a class="nav-link py-3 px-4 active bg-secondary" href="{{url('liste_sinistre')}}">
+            <a class="nav-link py-3 px-4 " href="{{url('formSinistre')}}">
                 <i class="bi bi-plus me-2"></i>Déclarer un sinistre v2
-            </a>
-            <a class="nav-link py-3 px-4" href="{{url('home')}}">
-                <i class="bi bi-list me-2"></i>Consulter un sinistre
-            </a>
-            <a class="nav-link py-3 px-4" href="#">
-                <i class="fas fa-list me-2"></i>Liste sinistre
-            </a>
-            <a class="nav-link py-3 px-4" href="#">
-                <i class="bi bi-telephone me-2"></i>Assistance
             </a>
         </nav>
     </div>
 
     <!-- Sidebar backdrop -->
     <div class="offcanvas-backdrop fade show d-none" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
-   
+    <div class="main-content" id="mainContent">
     <!-- Main content -->
     @yield('content')
-    
+    </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
     
     <script>
@@ -232,16 +224,11 @@
 
         // Form validation
         document.getElementById('claimForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            if (this.checkValidity()) {
-                // Form is valid, process submission
-                const toast = new bootstrap.Toast(document.createElement('div'));
-                alert('Déclaration envoyée avec succès ! Vous recevrez un numéro de dossier par email.');
-            } else {
-                // Show validation errors
+            if (!this.checkValidity()) {
+                e.preventDefault();
                 this.classList.add('was-validated');
             }
+            // sinon, Laravel traitera le formulaire normalement
         });
 
         // Auto-format license plate to uppercase
