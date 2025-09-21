@@ -10,6 +10,7 @@ class ResponsableController extends Controller
     //
     public function index(){
         $sinistres = Sinistre::with(['assurePrincipals','statut'])->get();
-        return view('responsable.index',compact('sinistres'));
+        $title = "Responsable";
+        return view('responsable.index',compact('sinistres','title'));
     }
 }

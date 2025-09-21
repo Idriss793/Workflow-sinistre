@@ -18,18 +18,36 @@
     </div>
 
     <!-- Alert documents manquants -->
-    <div class="alert alert-danger d-flex align-items-start">
+     @if($manquants->isNotEmpty())
+        <div class="alert alert-danger d-flex align-items-start">
+            <i class="bi bi-exclamation-triangle fa-lg me-2 mt-1"></i>
+            <div>
+                <h5 class="alert-heading">Documents manquants</h5>
+                <p class="mb-1">Veuillez fournir les documents suivants pour finaliser le traitement :</p>
+                <ul class="mb-0">
+                    @foreach($manquants as $doc)
+                        @if(array_key_exists($doc, $nomsDocuments))
+                            <li>{{ $nomsDocuments[$doc] }}</li>
+                        @endif
+                    @endforeach
+                </ul>
+            </div>
+        </div>
+    @endif
+
+    <!-- <div class="alert alert-danger d-flex align-items-start">
         <i class="fas fa-exclamation-triangle fa-lg me-2 mt-1"></i>
         <div>
             <h5 class="alert-heading">Documents manquants</h5>
             <p class="mb-1">Veuillez fournir les documents suivants pour finaliser le traitement :</p>
             <ul class="mb-0">
+               
                 <li>Constat amiable d'accident signé</li>
                 <li>Photos des dégâts complets du véhicule</li>
                 <li>Relevé d'informations du permis de conduire</li>
             </ul>
         </div>
-    </div>
+    </div> -->
 
     <!-- Onglets Bootstrap -->
     <ul class="nav nav-tabs" id="sinistreTabs" role="tablist">

@@ -13,16 +13,14 @@ use App\Models\AssureTiersSinistre;
 
 class SinistreController  extends Controller
 {
-    public function home(Request $request){
-        return view('gestionnaires.index');
-    }
+   
     public function index(Request $request){
         return view('gestionnaires.formDeclarationSinistre');
     }
     public function declarerSinistre(Request $request){
         return view('gestionnaires.declarerSinistre');
     }
-    public function listeSinistre(Request $request){
+    public function home(Request $request){
         $sinistres = Sinistre::with(['assurePrincipals','statut'])->get();
         return view('gestionnaires.listeSinistre',compact('sinistres'));
     }
@@ -53,7 +51,7 @@ class SinistreController  extends Controller
 
         $Sinistre = Sinistre::create([
             'date_sinistre' => $request -> date_sinistre,
-            'lieu' => $request -> lieu, 
+            'lieu' => $request -> lieu,
             'statut_id'=> $statut-> id,
             'type_sinistre' => $request -> type_sinistre,
             'description' => $request -> description,
@@ -94,7 +92,32 @@ class SinistreController  extends Controller
 
     public function show(string $id){
         $sinistres = Sinistre::with(['assureTiers','assurePrincipals','statut','documents'])->findorFail($id);
-       
-        return view('gestionnaires.index',compact('sinistres'));
+        // Liste des types de documents obligatoires
+        $obligatoires = ['contrat', 'carte_grise', 'permis'];
+        //Pour afficher des noms de documents lisible par l'utilisateur
+        $nomsDocuments = [
+        'carte_grise' => 'Carte grise',
+        'contrat' => "Contrat de l'assuré",
+        'permis' => 'Permis de conduire',
+        ];
+        // Types de documents déjà fournis
+        $fournis = $sinistres->documents->pluck('type_doc')->map(fn($type) => strtolower($type))->unique();
+    
+        // Documents manquants
+        $manquants = collect($obligatoires)->filter(fn($doc) => !$fournis->contains($doc));
+
+
+        //Mise à jours du status si tous les documents iobligatoire sont fournies
+        if ($manquants->isEmpty()){
+            $statut= Statuts::find('2');
+            $sinistres->statut_id = $statut -> id;
+            $sinistres->save();
+        }else{
+            $statut= Statuts::find('1');
+            $sinistres->statut_id = $statut -> id;
+            $sinistres->save();
+        }
+
+        return view('gestionnaires.index',compact('sinistres','manquants','nomsDocuments'));
     }
 }

@@ -171,7 +171,7 @@
             </h4>
         </div>
         <nav class="nav flex-column">
-            <a class="nav-link py-3 px-4" href="{{url('listeSinistre')}}">
+            <a class="nav-link py-3 px-4" href="{{url('home')}}">
                 <i class="bi bi-speedometer2 me-2"></i>Tableau de bord
             </a>
             <a class="nav-link py-3 px-4 " href="{{url('declarerSinistre')}}">

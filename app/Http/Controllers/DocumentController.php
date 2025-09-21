@@ -45,5 +45,8 @@ class DocumentController extends Controller
         return round($taille, $decimales) . ' ' . $unites[$i];
     }
 
-    
+    public function verifyDocument(String $id){
+        $sinistres = Sinistre::with(['documents'])->findorFail($id);
+        //$sinistres->documents->whereIn('type_doc', ['photos',]) as $document
+    }
 }
