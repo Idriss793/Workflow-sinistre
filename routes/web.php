@@ -17,7 +17,7 @@ Route::get('/', function () {
 Route::get('/home',[SinistreController::class,'home'])->name('gestionnaire.home');
 Route::get('/formSinistre',[SinistreController::class,'index'])->name('gestionnaire.index');
 Route::get('/declarerSinistre',[SinistreController::class,'declarerSinistre'])->name('gestionnaire.declarerSinistre');
-Route::get('/sinistres/{id}',[SinistreController::class,'show'])->name('gestionnaire.showSinistre');
+Route::get('/gestionnaire/sinistres/{id}',[SinistreController::class,'show'])->name('gestionnaire.showSinistre');
 Route::post('/declarerSinistre', [SinistreController::class, 'store'])->name('gestionnaire.store');
 
 //route pour l'envoie de document
@@ -31,7 +31,9 @@ Route::post('/storeStatut',[StatutController::class,'store'])->name('admin.store
 
 //Route pour l'interface responsable
 Route::get('/indexResponsable',[ResponsableController::class,'index'])->name('responsable.index');
+Route::get('/responsable/sinistres/{id}',[ResponsableController::class,'show'])->name('responsable.show');
 
 
 //Route pour l'interface expert
 Route::get('/indexExpert',[ExpertController::class,'index'])->name('expert.index');
+Route::post('/attribuerExpert/{id}', [SinistreController::class,'attribuerExpert'])->name('expert.attribuerExpert');

@@ -76,7 +76,29 @@
                     </div>
                 </div>
             </div>
-
+            <!-- Filtres et recherche -->
+            <div class="row mb-4 mt-4">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <input type="text" class="form-control" id="searchInput" placeholder="Rechercher un sinistre...">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="statusFilter">
+                        <option value="">Tous les statuts</option>
+                        <option value="en_attente_de_ducument">En attente de ducument</option>
+                        <option value="en_attente_expertise">En attente attente d'expertise</option>
+                        <option value="en_attente_expertise">En attente d'expert</option>
+                        <option value="en_cours_expertise">En cours d'expertise</option>
+                        <option value="en_attente_validation">En attente validation</option>
+                        <option value="rejete">Rejeté</option>
+                        <option value="cloture">Clôturé</option>
+                    </select>
+                </div>
+                
+                
+            </div>
             <div class="card">
                 <div class="card-body">
                     <div class="table-responsive">
@@ -108,7 +130,7 @@
                                         <td>{{ $sinistre->statut->lib_statut }}</td>
                                         <td>Martin</td>
                                         <td>
-                                            <a class="btn btn-sm btn-primary" href="{{route('gestionnaire.showSinistre',$sinistre->id)}}">
+                                            <a class="btn btn-sm btn-primary" href="{{route('responsable.show',$sinistre->id)}}">
                                                 <i class="bi bi-eye" >Consulter</i>
                                             </a>
                                             <a class="btn btn-sm btn-success">
@@ -127,5 +149,5 @@
                 </div>
             </div>
         </div>
-    </div>
+</div>
 @endsection

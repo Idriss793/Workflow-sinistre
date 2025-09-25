@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('templates.navbar')
 @section('content')
 <style>
     .img-hover-zoom {
@@ -10,33 +10,20 @@
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
     }
 </style>
+
+
 <div class="container-fluid my-4">
+    
     <!-- En-tête -->
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <a href="{{ url('/home') }}" class="btn btn-outline-secondary ">
+        <a href="{{ url('/indexResponsable') }}" class="btn btn-outline-secondary ">
             <i class="fas fa-arrow-left"></i> Retour
         </a>
         <h2>Consultation du sinistre #{{$sinistres->numero_sinistre}}</h2>
         <span class="badge bg-warning fs-6">{{ $sinistres->statut->lib_statut}}</span>
     </div>
 
-    <!-- Alert documents manquants -->
-     @if($manquants->isNotEmpty())
-        <div class="alert alert-danger d-flex align-items-start">
-            <i class="bi bi-exclamation-triangle fa-lg me-2 mt-1"></i>
-            <div>
-                <h5 class="alert-heading">Documents manquants</h5>
-                <p class="mb-1">Veuillez fournir les documents suivants pour finaliser le traitement :</p>
-                <ul class="mb-0">
-                    @foreach($manquants as $doc)
-                        @if(array_key_exists($doc, $nomsDocuments))
-                            <li>{{ $nomsDocuments[$doc] }}</li>
-                        @endif
-                    @endforeach
-                </ul>
-            </div>
-        </div>
-    @endif
+    
 
     <!-- <div class="alert alert-danger d-flex align-items-start">
         <i class="fas fa-exclamation-triangle fa-lg me-2 mt-1"></i>
@@ -108,26 +95,14 @@
 
             <h5>Photos du sinistre</h5>
             <div class="row">
-                @forelse($sinistres->documents->whereIn('type_doc', ['photos']) as $document)
-                    @php
-                        // Vérifie si le fichier existe réellement dans storage
-                        $imgPath = ($document->path && file_exists(storage_path('app/public/' . $document->path)))
-                                    ? asset('storage/' . $document->path)
-                                    : asset('image/defaultimage.png');
-                    @endphp
-
-                    <div class="col-md-3 mb-3">
-                        <div class="card">
-                            <img src="{{ $imgPath }}" class="card-img-top img-hover-zoom rounded" alt="Photo du sinistre">
-                        </div>
+            @foreach($sinistres->documents->whereIn('type_doc', ['photos']) as $document)
+                <div class="col-md-3 mb-3">
+                    <div class="card" >
+                        <img src="{{ asset('storage/' . $document->path) }}"class="card-img-top img-hover-zoom rounded" alt="Image"> 
                     </div>
-                @empty
-                    <div class="col-12">
-                        <div class="alert alert-info">Aucune photo disponible pour ce sinistre.</div>
-                    </div>
-                @endforelse
-            </div>
-
+                </div>
+            @endforeach
+        </div>
         </div>
 
         <!-- Assuré principal -->
@@ -214,82 +189,39 @@
                     <i class="fas fa-check-circle text-success"></i>
                 </li>
             </ul>
-           
+
             <div class="card">
                 <div class="card-body">
-                    @if ($sinistres->documents && $sinistres->documents->count())
-                        <h5 class="card-title">Documents téléversés</h5>
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Type</th>
-                                    <th>Nom</th>
-                                    <th>Taille</th>
-                                    <th>Date</th>
-                                    <th class="text-center">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($sinistres->documents as $document)
-                                <tr>
-                                    <td>{{$document->type_doc}}</td>
-                                    <td>{{$document->nom_fichier}}</td>
-                                    <td>{{$document->taille}}</td>
-                                    <td>{{$document->created_at}}</td>
-                                    <td class="text-center">
-                                        <a href="{{asset('storage/' . $document->path)}}" target="_blank" class="btn btn-sm btn-info">Voir</a>
-                                        <a href="{{asset('storage/' . $document->path)}}" download class="btn btn-sm btn-success">Télécharger</a>
-                                    </td>
-                                </tr>
-                                    
-                                @endforeach
-                            </tbody>
-                        </table>
-                    @else
-                        <div class="alert alert-info">Aucun document disponible pour ce sinistre.</div>
-                    @endif
+                    <h5 class="card-title">Documents téléversés</h5>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Nom</th>
+                                <th>Taille</th>
+                                <th>Date</th>
+                                <th class="text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($sinistres->documents as $document)
+                            <tr>
+                                <td>{{$document->type_doc}}</td>
+                                <td>{{$document->nom_fichier}}</td>
+                                <td>{{$document->taille}}</td>
+                                <td>{{$document->created_at}}</td>
+                                <td class="text-center">
+                                    <a href="{{asset('storage/' . $document->path)}}" target="_blank" class="btn btn-sm btn-info">Voir</a>
+                                    <a href="{{asset('storage/' . $document->path)}}" download class="btn btn-sm btn-success">Télécharger</a>
+                                </td>
+                            </tr>
+                            
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div>
-            
                 
-            <!-- Form upload -->
-            <div class="mt-4">
-                @if (session('status'))
-                    <div class="alert alert-success">
-                        {{ session('status') }}
-                    </div>
-                @endif
-                <h5>Ajouter un document</h5>
-                <form method="POST" class="row g-3" enctype="multipart/form-data" action="{{ route('document.store') }}">
-                    @csrf
-                    <input type="hidden" name="sinistre_id" value="{{ $sinistres->id ?? old('sinistre_id') }}">
-                    <div class="col-md-3">
-                        <label for="documentType" class="form-label">Type de document</label>
-                        <select class="form-select" id="documentType" name="type_doc" required>
-                            <option value="" disabled {{ old('type_doc') ? '' : 'selected' }}>Sélectionner...</option>
-                            <option value="constat" {{ old('type_doc') == 'constat' ? 'selected' : '' }}>Constat amiable</option>
-                            <option value="photos" {{ old('type_doc') == 'photos' ? 'selected' : '' }}>Photos</option>
-                            <option value="permis" {{ old('type_doc') == 'permis' ? 'selected' : '' }}>Relevé permis</option>
-                            <option value="carte_grise" {{ old('type_doc') == 'carte_grise' ? 'selected' : '' }}>Carte grise</option>
-                            <option value="devis" {{ old('type_doc') == 'devis' ? 'selected' : '' }}>Devis</option>
-                            <option value="contrat" {{ old('type_doc') == 'contrat' ? 'selected' : '' }}>Contrat Assuré</option>
-                            <option value="autre" {{ old('type_doc') == 'autre' ? 'selected' : '' }}>Autre</option>
-                        </select>
-                    </div>
-
-                    <div class="col-md-4">
-                        <label for="formFile" class="form-label">Fichier</label>
-                        <input class="form-control" type="file" id="formFile" name="path">
-                    </div>
-                    <div class="col-md-3">
-                        <label for="nom_fichier" class="form-label">Nom du document</label>
-                        <input class="form-control" type="text" id="nom_fichier" name="nom_fichier" value="">
-                    </div>
-                    <div class="col-md-2 d-grid">
-                        <button type="submit" class="btn btn-primary">Ajouter</button>
-                    </div>
-                </form>
-            </div>
         </div>
     </div>
 </div>

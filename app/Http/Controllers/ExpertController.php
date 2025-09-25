@@ -11,4 +11,6 @@ class ExpertController extends Controller
         $title = "Expert";
         return view('expert.indexExpert',compact('title'));
     }
+
+
 }

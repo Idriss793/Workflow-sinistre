@@ -20,6 +20,7 @@ class AssureTiers extends Model
 
      public function sinistres()
     {
-        return $this->belongsToMany(Sinistre::class, 'assure_tiers_sinistres', 'assure_tiers_id', 'sinistre_id');
+        return $this->belongsToMany(Sinistre::class, 'assure_tiers_sinistres', 'assure_tiers_id', 'sinistre_id')
+        ->withTimestamps();
     }
 }

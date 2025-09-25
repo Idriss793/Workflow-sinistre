@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\User;
 use App\Models\Document;
 use Illuminate\Database\Eloquent\Model;
 
@@ -53,5 +54,14 @@ class Sinistre extends Model
         return $this->hasMany(Document::class, 'sinistre_id');
     }
 
+    public function users(){
+        return $this->belongsTo(User::class,'user_id');
+    }
+
+    //relation entre utilisateur expert et sinistre
+    public function experts(){
+        return $this->belongsToMany(User::class, 'sinistre_user', 'sinistre_id', 'user_id')
+        ->withTimestamps();
+    }
 }
 

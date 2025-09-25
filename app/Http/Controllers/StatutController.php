@@ -9,7 +9,8 @@ class StatutController extends Controller
 {
     //
     public function index(){
-        return view('admin.createStatut');
+        $title = "Administrateur";
+        return view('admin.createStatut',compact('title'));
     }
     public function store(Request $request){
         $request->validate([

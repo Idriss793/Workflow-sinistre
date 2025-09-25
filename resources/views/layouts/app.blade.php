@@ -149,7 +149,7 @@
             <button class="btn btn-outline-light me-3" type="button" id="sidebarToggle">
                 <i class="bi bi-list"></i>
             </button>
-             <h2 class="text-white "><i class=" bi-file-medical-alt me-2"></i>Gestion des Sinistres</h2>
+             <h2 class="text-white "><i class=" bi-file-medical-alt me-2"></i>{{$title}} sinistre</h2>
             <button class="btn btn-outline-primary position-relative" data-bs-toggle="modal" data-bs-target="#notificationsModal">
                 <i class="bi bi-bell"></i>
                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge" id="notificationCount">0</span>

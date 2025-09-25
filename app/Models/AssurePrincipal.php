@@ -18,6 +18,7 @@ class AssurePrincipal extends Model
 
     public function sinistres()
     {
-        return $this->belongsToMany(Sinistre::class, 'assure_sinistres', 'assure_id', 'sinistre_id');
+        return $this->belongsToMany(Sinistre::class, 'assure_sinistres', 'assure_id', 'sinistre_id')
+        ->withTimestamps();
     }
 }

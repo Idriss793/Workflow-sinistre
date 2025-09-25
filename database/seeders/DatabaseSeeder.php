@@ -19,5 +19,11 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
+
+        // Appel dans l'ordre : roles d'abord, puis users
+        $this->call([
+            RolesTableSeeder::class,
+            UsersTableSeeder::class,
+        ]);
     }
 }
