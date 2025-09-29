@@ -1,4 +1,4 @@
-@extends('templates.navbar')
+@extends('templates.navbar3')
 @section('content')
 <div class="main-content" id="mainContent">
         <div class="container mt-5">
@@ -145,6 +145,11 @@
                                 @endforeach
                             </tbody>
                         </table>
+                        <div class="d-flex justify-content-center mt-3">
+                            <nav>
+                                {{ $sinistres->links() }}
+                            </nav>
+                        </div>
                     </div>
                 </div>
             </div>

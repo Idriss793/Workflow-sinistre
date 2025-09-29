@@ -97,31 +97,52 @@
         </div>
     </div>
 
-    <!-- Filtres et recherche -->
+
     <div class="row mb-4 mt-4">
-        <div class="col-md-4">
-            <div class="input-group">
-                <span class="input-group-text"><i class="fas fa-search"></i></span>
-                <input type="text" class="form-control" id="searchInput" placeholder="Rechercher un sinistre...">
+        
+        <!-- Filtres et recherche -->
+        <form method="GET" action="{{ route('gestionnaire.home') }}">
+            <div class="row mb-4 mt-4">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control" id="searchInput" name="search" placeholder="Rechercher un sinistre...">
+                    </div>
+                </div>
+                <!-- Filtre statut -->
+                <div class="col-md-3">
+                    <select class="form-select" name="statut" onchange="this.form.submit()">
+                        <option value="">Tous les statuts</option>
+                        <option value="1" {{ request('statut')=='1' ? 'selected' : '' }}>En attente de document</option>
+                        <option value="2" {{ request('statut')=='2' ? 'selected' : '' }}>En attente expert</option>
+                        <option value="3" {{ request('statut')=='3' ? 'selected' : '' }}>En attente expertise</option>
+                        <option value="4" {{ request('statut')=='4' ? 'selected' : '' }}>Rejeté</option>
+                        <option value="5" {{ request('statut')=='5' ? 'selected' : '' }}>Clôturé</option>
+                    </select>
+                </div>
+
+                <!-- Filtre type sinistre -->
+                <div class="col-md-2">
+                    <select class="form-select" name="type_sinistre" onchange="this.form.submit()">
+                        <option value="">Tous types</option>
+                        <option value="collision" {{ request('type_sinistre')=='type_sinistre' ? 'selected' : '' }}>Collision</option>
+                        <option value="vol" {{ request('type_sinistre')=='vol' ? 'selected' : '' }}>Vole</option>
+                        <option value="materiel" {{ request('type_sinistre')=='materiel' ? 'selected' : '' }}>Materiel</option>
+                    </select>
+                </div>
+
+                <!-- Filtre par période -->
+                <div class="col-md-2">
+                    <input type="date" name="date_declaration" class="form-control" value="{{ request('date_declaration') }}"  onchange="this.form.submit()">
+                </div>
+
             </div>
-        </div>
-        <div class="col-md-3">
-            <select class="form-select" id="statusFilter">
-                <option value="">Tous les statuts</option>
-                <option value="en_attente_de_ducument">En attente de ducument</option>
-                <option value="en_attente_expertise">En attente attente d'expertise</option>
-                <option value="en_attente_expertise">En attente d'expert</option>
-                <option value="en_cours_expertise">En cours d'expertise</option>
-                <option value="en_attente_validation">En attente validation</option>
-                <option value="rejete">Rejeté</option>
-                <option value="cloture">Clôturé</option>
-            </select>
-        </div>
+        </form>
         
         <div class="col-md-2">
-            <button class="btn btn-success w-100" data-bs-toggle="modal" data-bs-target="#addSinistreModal">
+            <a href="{{url('formSinistre')}}" class="btn btn-success w-100">
                 <i class="fas fa-plus me-1"></i>Nouveau
-            </button>
+            </a>
         </div>
         @if(session('status'))
             <div class="alert alert-success alert-dismissible fade show m-3 p-2" role="alert">
@@ -150,6 +171,7 @@
                                 Date <i class="fas fa-sort sort-arrow"></i>
                             </th>
                             <th>Assuré</th>
+                            <th>Type de sinistre</th>
                             <th class="sortable" data-sort="statut">
                                 Statut <i class="fas fa-sort sort-arrow"></i>
                             </th>
@@ -165,6 +187,7 @@
                                 @foreach ($sinistre->assurePrincipals as $assure)
                                     <td>{{ $assure->nom }}</td>
                                 @endforeach
+                                <td>{{ $sinistre->type_sinistre }}</td>
                                 <td>{{ $sinistre->statut->lib_statut }}</td>
 
                                 <!-- Récupération et affichage du nom de l'expert automobile -->
@@ -240,9 +263,17 @@
                                     <td>
                                         <!-- Attribuer un sinistre à un expert -->
                                         @if ($sinistre->experts->contains($expert->id))
-                                            <button class="btn btn-sm btn-outline-success" disabled>
+                                        <div class="btn-group">
+                                             <button class="btn btn-sm btn-outline-success" disabled>
                                                 <i class="bi bi-check-circle-fill">attribué"</i>
                                             </button>
+                                            <form method="GET" action="{{ route('expert.annulerExpert',  [$sinistre->id, $expert->id]) }}">
+                                                <button class="btn btn-outline-danger">
+                                                    <i class="fas fa-undo"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                           
                                         @else
                                             <form action="{{ route('expert.attribuerExpert', $sinistre->id) }}" method="POST">
                                                 @csrf
@@ -251,6 +282,7 @@
                                                     <i class="bi bi-user-check"></i> Attribuer
                                                 </button>
                                             </form>
+                                            
                                         @endif
                                     </td>
                                 </tr>

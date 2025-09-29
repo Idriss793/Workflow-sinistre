@@ -7,10 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Devis extends Model
 {
     //
-    protected $fillable = [
-        'montant',
-        'commentaire',
-        'id_sinistre',
-        'active',
+    protected $fillable =[
+        'devis_id'
     ];
 }

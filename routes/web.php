@@ -3,6 +3,7 @@
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\ExpertController;
 use App\Http\Controllers\StatutController;
 use App\Http\Controllers\DocumentController;
@@ -19,6 +20,7 @@ Route::get('/formSinistre',[SinistreController::class,'index'])->name('gestionna
 Route::get('/declarerSinistre',[SinistreController::class,'declarerSinistre'])->name('gestionnaire.declarerSinistre');
 Route::get('/gestionnaire/sinistres/{id}',[SinistreController::class,'show'])->name('gestionnaire.showSinistre');
 Route::post('/declarerSinistre', [SinistreController::class, 'store'])->name('gestionnaire.store');
+
 
 //route pour l'envoie de document
 Route::post('/storeFile',[DocumentController::class,'store'])->name('document.store');
@@ -37,3 +39,12 @@ Route::get('/responsable/sinistres/{id}',[ResponsableController::class,'show'])-
 //Route pour l'interface expert
 Route::get('/indexExpert',[ExpertController::class,'index'])->name('expert.index');
 Route::post('/attribuerExpert/{id}', [SinistreController::class,'attribuerExpert'])->name('expert.attribuerExpert');
+Route::get('/annulerExpert/{sinistre}/{expert}',[SinistreController::class,'annulerExpert'])->name('expert.annulerExpert');
+
+Route::get('/expert/sinistres/{id}',[ExpertController::class,'show'])->name('expert.show');
+Route::post('/storeExpertise',[ExpertController::class,'storeExpertise'])->name('expert.storeExpertise');
+
+
+//Routes pour la gestion des utilisateurs et l'authentification
+Route::get('/login',[UserController::class,'showLoginForm'])->name('auth.login');
+Route::get('/register',[UserController::class,'showRegisterForm'])->name('auth.register');

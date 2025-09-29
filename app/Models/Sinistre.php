@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\User;
 use App\Models\Document;
+use App\Models\Expertise;
 use Illuminate\Database\Eloquent\Model;
 
 class Sinistre extends Model
@@ -62,6 +63,11 @@ class Sinistre extends Model
     public function experts(){
         return $this->belongsToMany(User::class, 'sinistre_user', 'sinistre_id', 'user_id')
         ->withTimestamps();
+    }
+
+    //relation entre expertise et sinistre
+    public function expertise(){
+        return $this->hasMany(Expertise::class,'sinistre_id');
     }
 }
 

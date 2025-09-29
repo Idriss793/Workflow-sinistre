@@ -6,6 +6,8 @@
     <title>Déclaration de Sinistre - Assurance Auto</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
         .logo {
             width: 150px; /* tu peux ajuster */
@@ -174,12 +176,12 @@
             <a class="nav-link py-3 px-4" href="{{url('home')}}">
                 <i class="bi bi-speedometer2 me-2"></i>Tableau de bord
             </a>
-            <a class="nav-link py-3 px-4 " href="{{url('declarerSinistre')}}">
+            <!-- <a class="nav-link py-3 px-4 " href="{{url('declarerSinistre')}}">
                 <i class="bi bi-exclamation-triangle me-2"></i>Déclarer un sinistre v1
             </a>
             <a class="nav-link py-3 px-4 " href="{{url('formSinistre')}}">
                 <i class="bi bi-plus me-2"></i>Déclarer un sinistre v2
-            </a>
+            </a> -->
         </nav>
     </div>
 

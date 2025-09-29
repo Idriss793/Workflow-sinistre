@@ -18,12 +18,12 @@
                 </div>
 
                 <!-- Alert -->
-                <div class="alert alert-info d-flex align-items-center mb-4" role="alert">
+                <!-- <div class="alert alert-info d-flex align-items-center mb-4" role="alert">
                     <i class="bi bi-info-circle me-2"></i>
                     <div>
                         <strong>Information importante :</strong> Veuillez remplir tous les champs obligatoires marqués d'un astérisque (*). Vos données sont sécurisées et traitées conformément à nos politiques de confidentialité.
                     </div>
-                </div>
+                </div> -->
 
                 <!-- Main form card -->
                 <div class="card shadow-lg border-0">

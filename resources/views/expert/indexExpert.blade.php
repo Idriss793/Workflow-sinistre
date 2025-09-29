@@ -80,21 +80,25 @@
                             </tr>
                         </thead>
                         <tbody class="text-center" id="sinistresTableBody">
-                            <tr>
-                                <td>SIN-01</td>
-                                <td>20-10-24</td>
-                                <td>Jean</td>
-                                <td><span class="badge bg-warning">En attente d'expertise</span></td>
-                                <td><span class="badge bg-secondary">Non envoyé</span></td>
-                                <td>
-                                    <a class="btn btn-sm btn-primary" href="#">
-                                        <i class="bi bi-eye"></i> Consulter
-                                    </a>
-                                    <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#rapportModal">
-                                        <i class="bi bi-file-earmark-plus"></i> Envoyer rapport
-                                    </button>
-                                </td>
-                            </tr>
+                            @foreach ($sinistres as $sinistre)
+                                <tr>
+                                    <td>{{$sinistre->numero_sinistre}}</td>
+                                    <td>{{$sinistre->created_at}}</td>
+                                    @foreach ($sinistre->assurePrincipals as $assure)
+                                        <td>{{ $assure->nom }}</td>
+                                    @endforeach
+                                    <td><span class="badge bg-warning">{{$sinistre->statut->lib_statut}}</span></td>
+                                    <td><span class="badge bg-secondary">Non envoyé</span></td>
+                                    <td>
+                                        <a class="btn btn-sm btn-primary" href="{{route('expert.show',$sinistre->id)}}">
+                                            <i class="bi bi-eye"></i> Consulter
+                                        </a>
+                                        <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#rapportModal">
+                                            <i class="bi bi-file-earmark-plus"></i> Envoyer rapport
+                                        </button>
+                                    </td>
+                                </tr>
+                            @endforeach
                         </tbody>
                     </table>
                 </div>

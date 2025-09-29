@@ -1,4 +1,4 @@
-@extends('templates.navbar')
+@extends('templates.navbar3')
 @section('content')
 <style>
     .img-hover-zoom {
@@ -16,9 +16,6 @@
     
     <!-- En-tête -->
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <a href="{{ url('/indexResponsable') }}" class="btn btn-outline-secondary ">
-            <i class="fas fa-arrow-left"></i> Retour
-        </a>
         <h2>Consultation du sinistre #{{$sinistres->numero_sinistre}}</h2>
         <span class="badge bg-warning fs-6">{{ $sinistres->statut->lib_statut}}</span>
     </div>

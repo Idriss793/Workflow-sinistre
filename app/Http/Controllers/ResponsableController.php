@@ -8,10 +8,13 @@ use Illuminate\Http\Request;
 class ResponsableController extends Controller
 {
     //
-    public function index(){
-        $sinistres = Sinistre::with(['assurePrincipals','statut'])->get();
+    public function index(Request $request){
+        $query = Sinistre::with(['assurePrincipals','statut']);
         $title = "Responsable";
-        return view('responsable.index',compact('sinistres','title'));
+        $url='indexResponsable';
+        //liste des sinistre attribué
+        $sinistres = $query->paginate(10)->appends($request->all());
+        return view('responsable.index',compact('sinistres','title','url'));
     }
 
     public function show(string $id){
@@ -19,7 +22,7 @@ class ResponsableController extends Controller
        
     
         $title="Responsable";
-
-        return view('responsable.show',compact('sinistres','title'));
+        $url='indexResponsable';
+        return view('responsable.show',compact('sinistres','title','url'));
     }
 }
