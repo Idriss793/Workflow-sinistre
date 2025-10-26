@@ -1,4 +1,5 @@
-@extends('layouts.app')
+@extends('templates.navbar2')
+
 @section('content')
 
 <div class="container mt-5">

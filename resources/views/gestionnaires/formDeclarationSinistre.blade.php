@@ -1,4 +1,5 @@
-@extends('layouts.app')
+@extends('templates.navbar2')
+
 @section('content')
 
         
@@ -27,7 +28,7 @@
 
                 <!-- Main form card -->
                 <div class="card shadow-lg border-0">
-                    <div class="card-header bg-primary-gradient text-white text-center py-4">
+                    <div class="card-header text-black text-center py-4">
                         <h2 class="mb-2">
                             <i class="bi bi-clipboard-check me-2"></i>Déclaration de Sinistre Automobile
                         </h2>

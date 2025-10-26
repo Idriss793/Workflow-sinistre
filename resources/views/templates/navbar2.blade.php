@@ -3,25 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Expert Automobile - SUNU Assurances')</title>
+    <title>@yield('title', $title. ' Automobile - SUNU Assurances')</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
-    <style>
+      <style>
         :root {
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --secondary-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-            --warning-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            --expert-color: #667eea;
-            --expert-secondary: #764ba2;
+        --primary-gradient: linear-gradient(135deg, #9E1B32 0%, #B7323C 100%);
+        --secondary-gradient: linear-gradient(135deg, #444444 0%, #666666 100%);
+        --warning-gradient: linear-gradient(135deg, #f5a623 0%, #f0932b 100%);
+        --expert-color: #9E1B32;       /* Couleur principale SUNU */
+        --expert-secondary: #444444;   /* Couleur secondaire (auto, gris) */
         }
 
         /* Navbar principale */
         .expert-navbar {
             background: var(--primary-gradient);
             backdrop-filter: blur(10px);
-            box-shadow: 0 2px 20px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 2px 20px rgba(158, 27, 50, 0.3);
             border: none;
             position: sticky;
             top: 0;
@@ -57,11 +57,11 @@
         }
 
         .expert-title {
-            background: rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.1);
             padding: 8px 20px;
             border-radius: 25px;
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
             color: white;
             font-weight: 600;
             display: flex;
@@ -77,9 +77,8 @@
 
         /* Navigation secondaire */
         .secondary-nav {
-            background: rgba(255,255,255,0.95);
-            backdrop-filter: blur(15px);
-            border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+            background: #fff;
+            border-bottom: 2px solid #9E1B32;
             padding: 0.5rem 0;
         }
 
@@ -87,23 +86,23 @@
             border-radius: 20px;
             padding: 8px 20px;
             margin: 0 4px;
-            color: #6c757d;
+            color: #444;
             font-weight: 500;
             transition: all 0.3s ease;
             border: 2px solid transparent;
         }
 
         .nav-pills .nav-link:hover {
-            color: var(--expert-color);
-            background: rgba(102, 126, 234, 0.1);
-            border-color: rgba(102, 126, 234, 0.2);
+            color: #9E1B32;
+            background: rgba(158, 27, 50, 0.1);
+            border-color: rgba(158, 27, 50, 0.2);
             transform: translateY(-1px);
         }
 
         .nav-pills .nav-link.active {
             background: var(--primary-gradient);
             color: white;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 4px 12px rgba(158, 27, 50, 0.3);
         }
 
         /* Notifications et profil */
@@ -316,6 +315,7 @@
             border: 2px solid white;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
+
     </style>
 </head>
 <body>
@@ -393,14 +393,14 @@
                             <i class="fas fa-user"></i>
                         </div>
                         <div class="user-info d-none d-md-block">
-                            <div class="user-name">Dr. Martin Dubois</div>
+                            <div class="user-name">Mr. Jean Does</div>
                             <div class="user-role">{{$title}} Automobile</div>
                         </div>
                         <i class="fas fa-chevron-down ms-2 d-none d-md-inline"></i>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li>
-                            <a class="dropdown-item" href="#">
+                            <a class="dropdown-item" href="{{ url('profileGestionnaire') }}">
                                 <i class="fas fa-user-circle"></i>
                                 <span>Mon Profil</span>
                             </a>
@@ -419,10 +419,13 @@
                         </li>
                         <li><hr class="dropdown-divider"></li>
                         <li>
-                            <a class="dropdown-item text-danger" href="#">
-                                <i class="fas fa-sign-out-alt"></i>
-                                <span>Déconnexion</span>
-                            </a>
+                            <form action="{{ route('logout') }}" method="POST">
+                                @csrf
+                                <a class="dropdown-item text-danger" href="#"  onclick="event.preventDefault(); this.closest('form').submit();">
+                                        <i class="fas fa-sign-out-alt"></i>
+                                    <span>Déconnexion</span>
+                                </a>
+                            </form>
                         </li>
                     </ul>
                 </div>
@@ -431,37 +434,23 @@
     </nav>
 
     <!-- Navigation secondaire -->
-    <!-- <nav class="secondary-nav">
+    <nav class="secondary-nav">
         <div class="container-fluid">
             <ul class="nav nav-pills justify-content-center justify-content-md-start">
                 <li class="nav-item">
-                    <a class="nav-link active" href="#">
+                    <a class="nav-link {{ Request::is('home') ? 'active' : '' }}" href="{{url('home')}}">
                         <i class="fas fa-tachometer-alt me-2"></i>Dashboard
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#">
-                        <i class="fas fa-file-medical-alt me-2"></i>Mes Sinistres
+                        <i class="fas fa-file-alt me-2"></i>Rapport
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-file-alt me-2"></i>Rapports
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-calendar-alt me-2"></i>Planning
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-history me-2"></i>Historique
-                    </a>
-                </li>
+                
             </ul>
         </div>
-    </nav> -->
+    </nav>
 
     <!-- Sidebar mobile (Offcanvas) -->
     <!-- <div class="offcanvas offcanvas-start" tabindex="-1" id="expertSidebar" aria-labelledby="expertSidebarLabel">
@@ -515,42 +504,80 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Gestion active des liens de navigation
-            const currentPath = window.location.pathname;
-            const navLinks = document.querySelectorAll('.nav-link');
+   
+      <script>
+        
+
+        
+
+        // Third party fields toggle
+        function toggleThirdPartyFields() {
+            const checkbox = document.getElementById('has_third_party');
+            const section = document.getElementById('third_party_section');
             
-            navLinks.forEach(link => {
-                if (link.getAttribute('href') === currentPath) {
-                    link.classList.add('active');
-                } else {
-                    link.classList.remove('active');
-                }
-            });
-
-            // Animation du compteur de notifications
-            const notificationCount = document.getElementById('notificationCount');
-            if (notificationCount && parseInt(notificationCount.textContent) > 0) {
-                notificationCount.style.display = 'flex';
+            if (checkbox.checked) {
+                section.classList.remove('d-none');
+            } else {
+                section.classList.add('d-none');
             }
+        }
 
-            // Smooth scroll pour les ancres
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    const target = document.querySelector(this.getAttribute('href'));
-                    if (target) {
-                        target.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start'
-                        });
-                    }
-                });
-            });
+        // Form validation
+        document.getElementById('claimForm').addEventListener('submit', function(e) {
+            if (!this.checkValidity()) {
+                e.preventDefault();
+                this.classList.add('was-validated');
+            }
+            // sinon, Laravel traitera le formulaire normalement
         });
+
+        // Auto-format license plate to uppercase
+        document.getElementById('num_matri').addEventListener('input', function(e) {
+            this.value = this.value.toUpperCase();
+        });
+
+        document.getElementById('num_matri_tiers').addEventListener('input', function(e) {
+            this.value = this.value.toUpperCase();
+        });
+
+        // Limit date selection to past and present
+        document.getElementById('date_sinistre').setAttribute('max', new Date().toISOString().split('T')[0]);
+
+        // Close sidebar when clicking backdrop
+        document.getElementById('sidebarBackdrop').addEventListener('click', toggleSidebar);
+
+        // Responsive behavior
+        window.addEventListener('resize', function() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            const mainContent = document.getElementById('mainContent');
+            
+            if (window.innerWidth > 768) {
+                backdrop.classList.add('d-none');
+            } else {
+                mainContent.classList.remove('shifted');
+            }
+         
+        });
+
+        // Initialize form validation styles
+        (function() {
+            'use strict';
+            window.addEventListener('load', function() {
+                var forms = document.getElementsByClassName('needs-validation');
+                var validation = Array.prototype.filter.call(forms, function(form) {
+                    form.addEventListener('submit', function(event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
+           
     </script>
-    
     @stack('scripts')
 </body>
 </html>

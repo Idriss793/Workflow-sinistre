@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\User;
+use App\Models\Passage;
 use App\Models\Document;
 use App\Models\Expertise;
 use Illuminate\Database\Eloquent\Model;
@@ -68,6 +69,12 @@ class Sinistre extends Model
     //relation entre expertise et sinistre
     public function expertise(){
         return $this->hasMany(Expertise::class,'sinistre_id');
+    }
+
+     public function passagers()
+    {
+        return $this->belongsToMany(Passage::class, 'passager_sinistre')
+                    ->withTimestamps();
     }
 }
 

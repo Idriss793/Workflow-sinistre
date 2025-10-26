@@ -18,12 +18,15 @@ class SinistreController  extends Controller
    
     public function index(Request $request){
         $title = "Gestionnaire";
-        return view('gestionnaires.formDeclarationSinistre',compact('title'));
+        $url='home';
+        return view('gestionnaires.formDeclarationSinistre',compact('title','url'));
     }
     public function declarerSinistre(Request $request){
        
         $title = "Gestionnaire";
-        return view('gestionnaires.declarerSinistre',compact('title'));
+        $url='home';
+
+        return view('gestionnaires.declarerSinistre',compact('title','url'));
     }
 
 
@@ -69,9 +72,9 @@ class SinistreController  extends Controller
         ->get();
         //titre
         $title="Gestionnaire";
+        $url='home';
 
-
-        return view('gestionnaires.listeSinistre',compact('sinistres','title','experts'));
+        return view('gestionnaires.listeSinistre',compact('sinistres','title','experts','url'));
     }
   
 
@@ -119,6 +122,7 @@ class SinistreController  extends Controller
             'prenom_tiers' => $request -> prenom_tiers,
             'num_tel_tiers' => $request -> num_tel_tiers,
             'num_pol_tiers' => $request -> num_pol_tiers,
+            'num_matri_tiers' => $request -> num_matri_tiers,
             'nom_assurance_tiers' => $request -> nom_assurance_tiers,
             'contact_assurance_tiers' => $request -> contact_assurance_tiers,
         ]);
@@ -142,75 +146,87 @@ class SinistreController  extends Controller
          ->orderBy('created_at', 'desc')
          ->paginate(10);
         $title = "Gestionnaire";
-
-        return view('gestionnaires.listeSinistre',compact('sinistres','experts','title'))->with('status','Sinistre déclarer avec succès');
+        $url='home';
+        return view('gestionnaires.listeSinistre',compact('sinistres','experts','title','url'))->with('status','Sinistre déclarer avec succès');
     }
 
     public function show(string $id)
-{
-    $sinistres = Sinistre::with([
-        'assureTiers',
-        'assurePrincipals',
-        'statut',
-        'documents',
-        'users',
-        'expertise'
-    ])->findOrFail($id);
+    {
+        $sinistres = Sinistre::with([
+            'assureTiers',
+            'assurePrincipals',
+            'statut',
+            'documents',
+            'users',
+            'expertise.expert',
+            'expertise.statut',
+             'passagers',
+        ])->findOrFail($id);
 
-    // Liste des types de documents obligatoires
-    $obligatoires = ['contrat', 'carte_grise', 'permis'];
+        // Liste des types de documents obligatoires
+        $obligatoires = ['contrat', 'carte_grise', 'permis'];
 
-    // Pour afficher des noms lisibles par l'utilisateur
-    $nomsDocuments = [
-        'carte_grise' => 'Carte grise',
-        'contrat'     => "Contrat de l'assuré",
-        'permis'      => 'Permis de conduire',
-    ];
+        // Pour afficher des noms lisibles par l'utilisateur
+        $nomsDocuments = [
+            'carte_grise' => 'Carte grise',
+            'contrat'     => "Contrat de l'assuré",
+            'permis'      => 'Permis de conduire',
+        ];
 
-    // Types de documents déjà fournis
-    $fournis = $sinistres->documents
-        ->pluck('type_doc')
-        ->map(fn($type) => strtolower($type))
-        ->unique();
+        // Types de documents déjà fournis
+        $fournis = $sinistres->documents
+            ->pluck('type_doc')
+            ->map(fn($type) => strtolower($type))
+            ->unique();
 
-    // Documents manquants
-    $manquants = collect($obligatoires)->filter(fn($doc) => !$fournis->contains($doc));
+        // Documents manquants
+        $manquants = collect($obligatoires)->filter(fn($doc) => !$fournis->contains($doc));
 
-    // Mise à jour du statut automatiquement
-    $sinistres->statut_id = $manquants->isEmpty() ? 2 : 1;
-    $sinistres->save();
+       if (in_array(strtolower($sinistres->statut->lib_statut), ["en attente d'expert", "en attente d'expertise"])) {
+            $sinistres->statut_id = $manquants->isEmpty() ? 2 : 1;
+            $sinistres->save();
+        }
+        $title = "Gestionnaire";
+        $url='home';
+         // Récupération des passagers associés à ce sinistre
+            $passages = $sinistres->passagers()->paginate(10);
 
-    $title = "Gestionnaire";
-    $url='home';
+        $conducteurExiste = $sinistres->passagers()->where('type_passager', 'conducteur')->exists();
 
-    return view('gestionnaires.index', compact('sinistres', 'manquants', 'nomsDocuments', 'title','url'));
-}
+        return view('gestionnaires.index', compact('sinistres', 'manquants', 'passages','nomsDocuments', 'title','url', 'conducteurExiste'));
+    }
 
 
     
 
-    //Fonction pour attribuer un sinistre à un expert automobile
-    public function attribuerExpert(string $id, Request $request){
-            $request->validate([
-                'expert_id' => 'required|string',
-            ]);
-            $sinistre = Sinistre::with(['statut'])->findOrFail($id);
-            
-            if (strtolower($sinistre->statut->lib_statut) === "en attente d'expert" || strtolower($sinistre->statut->lib_statut) === "en attente d'expertise"){
+   // Fonction pour attribuer un sinistre à un expert automobile
+    public function attribuerExpert(string $id, Request $request)
+    {
+        $request->validate([
+            'expert_id' => 'required|string',
+        ]);
 
-                //$statut = Statuts::where('ordre_statut', 2)->first();
-                //mise a jour du statut
-                $nouveauStatut= Statuts::find(3);
-                $sinistre->statut_id = $nouveauStatut -> id;
+        $sinistre = Sinistre::with(['statut'])->findOrFail($id);
 
-                //attribution d'un sinistre a un expert automobile
-                $sinistre->experts()->syncWithoutDetaching([$request->expert_id]);
-                $sinistre->save();
+        // Vérifie le statut du sinistre avant attribution
+        $libelle = strtolower($sinistre->statut->lib_statut);
 
-                return redirect()->back()->with('status','Sinistre attribué avec succès');
-            }
-        return  redirect()->back()->with('error', "Impossible d'attribuer un expert à ce sinistre car il y a des documents manquants");
+        if ($libelle === "en attente d'expert" || $libelle === "en attente d'expertise") {
+
+            // Met à jour le statut du sinistre
+            $nouveauStatut = Statuts::find(3); // Par exemple : "Expert assigné"
+            $sinistre->statut_id = $nouveauStatut->id;
+            $sinistre->save(); // On sauvegarde d'abord la mise à jour du statut
+
+            // Attribue l'expert sans détacher les précédents
+            $sinistre->experts()->syncWithoutDetaching([$request->expert_id]);
+
+            return redirect()->back()->with('status', 'Sinistre attribué avec succès');
+        }
+
+        return redirect()->back()->with('error', "Impossible d'attribuer un expert à ce sinistre car il y a des documents manquants");
     }
+
 
     //Fonction pour annuler l'attribution d'un expert$
     public function annulerExpert($sinistre_id, $expert_id){
@@ -221,4 +237,10 @@ class SinistreController  extends Controller
 
     }
 
+    //Affichage du profil du gestionnaire
+    public function profileGestionnaire(Request $request){
+        $title = "Gestionnaire";
+        $url='home';
+        return view('gestionnaires.profile',compact('title','url'));
+    }
 }

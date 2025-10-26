@@ -1,50 +1,87 @@
 <?php
 
 
+use Illuminate\Http\Request;
+use App\Models\AssurePrincipal;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ExpertController;
 use App\Http\Controllers\StatutController;
+use App\Http\Controllers\PassageController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\SinistreController;
+use App\Http\Controllers\assureTiersController;
 use App\Http\Controllers\ResponsableController;
+use App\Http\Controllers\assurePrincipalController;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('auth.login');
 });
 
-//Route pour l'interface gestionnaire
-Route::get('/home',[SinistreController::class,'home'])->name('gestionnaire.home');
-Route::get('/formSinistre',[SinistreController::class,'index'])->name('gestionnaire.index');
-Route::get('/declarerSinistre',[SinistreController::class,'declarerSinistre'])->name('gestionnaire.declarerSinistre');
-Route::get('/gestionnaire/sinistres/{id}',[SinistreController::class,'show'])->name('gestionnaire.showSinistre');
-Route::post('/declarerSinistre', [SinistreController::class, 'store'])->name('gestionnaire.store');
+// Routes publiques (connexion / inscription)
+Route::get('/login', [UserController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [UserController::class, 'login'])->name('auth.connection');
+
+// Déconnexion (protégée)
+Route::post('/logout', function (Request $request) {
+    Auth::logout();
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+    return redirect()->route('login');
+})->middleware('auth')->name('logout');
+
+// Routes accessibles uniquement aux utilisateurs connectés
+Route::middleware('auth')->group(function () {
+
+    // Interface gestionnaire
+    Route::middleware('role:gestionnaire')->group(function () {
+        Route::get('/profileGestionnaire', [SinistreController::class, 'profileGestionnaire'])->name('gestionnaire.profile');
+        Route::get('/home', [SinistreController::class, 'home'])->name('gestionnaire.home');
+        Route::get('/formSinistre', [SinistreController::class, 'index'])->name('gestionnaire.index');
+        Route::get('/declarerSinistre', [SinistreController::class, 'declarerSinistre'])->name('gestionnaire.declarerSinistre');
+        Route::post('/declarerSinistre', [SinistreController::class, 'store'])->name('gestionnaire.store');
+        Route::get('/gestionnaire/sinistres/{id}', [SinistreController::class, 'show'])->name('gestionnaire.showSinistre');
+        Route::post('/storeFile',[DocumentController::class,'store'])->name('document.store');
+        Route::get('/annulerExpert/{sinistre}/{expert}', [SinistreController::class, 'annulerExpert'])->name('expert.annulerExpert');
+        Route::post('/attribuerExpert/{id}', [SinistreController::class, 'attribuerExpert'])->name('expert.attribuerExpert');
+        Route::put('/updateAssurePrincipal/{id}', [assurePrincipalController::class, 'updateAssurePrincipal'])->name('assurePrincipal.update');
+        Route::put('/updateAssureTiers/{id}', [assureTiersController::class, 'updateAssureTiers'])->name('assureTiers.update');
+        Route::post('/storeAssureTiers', [assureTiersController::class, 'storeAssureTiers'])->name('assureTiers.ajouter');
+  
 
 
-//route pour l'envoie de document
-Route::post('/storeFile',[DocumentController::class,'store'])->name('document.store');
 
+        // Passages
+        Route::post('/storePassage', [PassageController::class, 'storePassage'])->name('passage.storePassage');
+        Route::get('/listePassages', [PassageController::class, 'listePassage'])->name('passage.liste');
+        Route::post('/joindreDocument', [PassageController::class, 'joindreDocument'])->name('passage.joindreDocument');
+        Route::put('/passage/{id}', [PassageController::class, 'update'])->name('passager.update');
+        Route::get('/passage/{id}', [PassageController::class, 'show'])->name('passage.show');
+    });
 
-//Route pour l'interface administrateur
-Route::get('/indexAdmin',[StatutController::class,'index'])->name('admin.formStatut');
-Route::post('/storeStatut',[StatutController::class,'store'])->name('admin.store');
+    // Interface expert
+    Route::middleware('role:expert')->group(function () {
+        Route::get('/profileExpert', [ExpertController::class, 'profile'])->name('expert.profile');
+        Route::get('/indexExpert', [ExpertController::class, 'index'])->name('expert.index');
+        Route::get('/listeExpertises', [ExpertController::class, 'listeExpertises'])->name('expert.listeExpertises');
+        Route::get('/expert/sinistres/{id}', [ExpertController::class, 'show'])->name('expert.show');
+        Route::post('/storeExpertise', [ExpertController::class, 'storeExpertise'])->name('expert.storeExpertise');
+    });
 
+    // Interface responsable
+    Route::middleware('role:responsable')->group(function () {
+        Route::get('/indexResponsable', [ResponsableController::class, 'index'])->name('responsable.index');
+        Route::get('/responsable/sinistres/{id}', [ResponsableController::class, 'show'])->name('responsable.show');
+        Route::get('/listePersonnel', [ResponsableController::class, 'showPersonnel'])->name('responsable.showPersonnel');
+        Route::get('/register', [UserController::class, 'showRegisterForm'])->name('auth.register');
 
-//Route pour l'interface responsable
-Route::get('/indexResponsable',[ResponsableController::class,'index'])->name('responsable.index');
-Route::get('/responsable/sinistres/{id}',[ResponsableController::class,'show'])->name('responsable.show');
+    });
 
-
-//Route pour l'interface expert
-Route::get('/indexExpert',[ExpertController::class,'index'])->name('expert.index');
-Route::post('/attribuerExpert/{id}', [SinistreController::class,'attribuerExpert'])->name('expert.attribuerExpert');
-Route::get('/annulerExpert/{sinistre}/{expert}',[SinistreController::class,'annulerExpert'])->name('expert.annulerExpert');
-
-Route::get('/expert/sinistres/{id}',[ExpertController::class,'show'])->name('expert.show');
-Route::post('/storeExpertise',[ExpertController::class,'storeExpertise'])->name('expert.storeExpertise');
-
-
-//Routes pour la gestion des utilisateurs et l'authentification
-Route::get('/login',[UserController::class,'showLoginForm'])->name('auth.login');
-Route::get('/register',[UserController::class,'showRegisterForm'])->name('auth.register');
+    // Interface administrateur
+    Route::middleware('role:administrateur')->group(function () {
+        Route::get('/indexAdmin', [StatutController::class, 'index'])->name('admin.formStatut');
+        Route::post('/storeStatut', [StatutController::class, 'store'])->name('admin.store');
+    });
+});

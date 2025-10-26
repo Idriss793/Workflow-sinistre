@@ -13,12 +13,7 @@ return new class extends Migration
     {
         Schema::create('expertises', function (Blueprint $table) {
             $table->id();
-            $table->enum('etat_general',['excellent','bon','moyen','mauvais'])->nullable();
             $table->decimal('estimation_degats',12,2)->nullable();
-            $table->text('analyse_dommages')->nullable();
-            $table->text('recommandations')->nullable();
-            $table->boolean('reparable')->nullable();
-            $table->boolean('expertise_complementaire')->nullable();
             $table->string('expertise_path')->nullable();
             $table->string('expert_id')->nullable();
             $table->string('sinistre_id')->nullable();

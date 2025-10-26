@@ -1,4 +1,9 @@
-@extends('layouts.app')
+@extends('templates.navbar2')
+
+
+
+
+
 @section('content')
 <style>
     .icon-circle {
@@ -158,10 +163,10 @@
     </div>
 
     <!-- Tableau des sinistres -->
-    <div class="card">
+    <div class="card shadow-sm">
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-hover" id="sinistresTable">
+                <table class="table table-hover align-middle" id="sinistresTable">
                     <thead class="table-dark text-center">
                         <tr>
                             <th class="sortable" data-sort="numero">
@@ -180,26 +185,73 @@
                         </tr>
                     </thead>
                     <tbody class="text-center" id="sinistresTableBody">
-                        @foreach ($sinistres as $sinistre)
+                        @forelse ($sinistres as $sinistre)
                             <tr>
-                                <td>{{$sinistre->numero_sinistre}}</td>
-                                <td>{{$sinistre->created_at}}</td>
+                                <td>{{ $sinistre->numero_sinistre }}</td>
+                                <td>{{ $sinistre->created_at->format('d/m/Y H:i') }}</td>
                                 @foreach ($sinistre->assurePrincipals as $assure)
                                     <td>{{ $assure->nom }}</td>
                                 @endforeach
                                 <td>{{ $sinistre->type_sinistre }}</td>
-                                <td>{{ $sinistre->statut->lib_statut }}</td>
+                                <td>
+                                    @php
+                                        $statut = strtolower($sinistre->statut->lib_statut);
+                                        switch ($statut) {
+                                            case 'en attente de document':
+                                                $badgeClass = 'bg-warning text-dark';
+                                                $icon = 'fa-file-alt';
+                                                break;
+                                            case 'en attente d\'expert':
+                                                $badgeClass = 'bg-info text-dark';
+                                                $icon = 'fa-user-clock';
+                                                break;
+                                            case 'en attente d\'expertise':
+                                                $badgeClass = 'bg-primary';
+                                                $icon = 'fa-search';
+                                                break;
+                                            case 'en attente de validation':
+                                                $badgeClass = 'bg-secondary';
+                                                $icon = 'fa-hourglass-half';
+                                                break;
+                                            case 'valider':
+                                            case 'validé':
+                                                $badgeClass = 'bg-success';
+                                                $icon = 'fa-check-circle';
+                                                break;
+                                            case 'rejeter':
+                                            case 'rejeté':
+                                                $badgeClass = 'bg-danger';
+                                                $icon = 'fa-times-circle';
+                                                break;
+                                            case 'clôturé':
+                                            case 'cloture':
+                                            case 'clos':
+                                                $badgeClass = 'bg-dark';
+                                                $icon = 'fa-lock';
+                                                break;
+                                            default:
+                                                $badgeClass = 'bg-light text-dark';
+                                                $icon = 'fa-question-circle';
+                                                break;
+                                        }
+                                    @endphp
 
-                                <!-- Récupération et affichage du nom de l'expert automobile -->
+                                    <span class="badge {{ $badgeClass }}">
+                                        <i class="fas {{ $icon }}"></i> {{ ucfirst($sinistre->statut->lib_statut) }}
+                                    </span>
+                                </td>
+
                                 <td>
                                     @if($sinistre->experts->isEmpty())
-                                        <span class="text-muted">Non attribué</span>
+                                        <span class="text-muted"><i class="fas fa-user-times"></i> Non attribué</span>
                                     @elseif($sinistre->experts->count() === 1)
-                                        <span class="badge bg-success">{{ $sinistre->experts->first()->name }}</span>
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-user-tie"></i> {{ $sinistre->experts->first()->name }}
+                                        </span>
                                     @else
                                         <div class="dropdown">
                                             <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                                {{ $sinistre->experts->count() }} Experts
+                                                <i class="fas fa-users"></i> {{ $sinistre->experts->count() }} Experts
                                             </button>
                                             <ul class="dropdown-menu">
                                                 @foreach($sinistre->experts as $expert)
@@ -210,90 +262,135 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <a class="btn btn-sm btn-primary" href="{{route('gestionnaire.showSinistre',$sinistre->id)}}">
-                                        <i class="bi bi-eye" >Consulter</i>
-                                    </a>
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <a class="btn btn-sm btn-primary" href="{{ route('gestionnaire.showSinistre',$sinistre->id) }}" 
+                                        data-bs-toggle="tooltip" title="Consulter le sinistre">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
 
-                                    <a class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#listExpertModal-{{ $sinistre->id }}">
-                                        <i class="bi bi-user-check"></i> Attribuer à un expert
-                                    </a>
+                                        <button class="btn btn-sm btn-success" data-bs-toggle="modal" 
+                                                data-bs-target="#listExpertModal-{{ $sinistre->id }}" 
+                                                data-bs-toggle="tooltip" title="Attribuer à un expert">
+                                            <i class="fas fa-user-check"></i>
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
-                            
-                        @endforeach
+                        @empty
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-4">
+                                    <i class="fas fa-info-circle fa-lg"></i> Aucun sinistre trouvé
+                                </td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
+
+                @if($sinistres->hasPages())
                 <div class="d-flex justify-content-center mt-3">
                     <nav>
                         {{ $sinistres->links() }}
                     </nav>
                 </div>
+                @endif
             </div>
         </div>
     </div>
 
-    <!-- Modal liste expert -->
-
+    <!-- Modaux des experts -->
     @foreach($sinistres as $sinistre)
-
-    <div class="modal fade" id="listExpertModal-{{ $sinistre->id }}" tabindex="-1" aria-labelledby="listExpertModalLabel-{{ $sinistre->id }}" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Attribuer à un expert – Sinistre #{{ $sinistre->numero_sinistre }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
-                </div>
-              
-                <div class="modal-body">
-                    <table class="table table-hover">
-                        <thead class="table-dark text-center">
-                            <tr>
-                                <th>Nom</th>
-                                <th>Email</th>
-                                <th>Sinistres en cours</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="text-center">
-                            @foreach($experts as $expert)
+        <div class="modal fade" id="listExpertModal-{{ $sinistre->id }}" tabindex="-1" aria-labelledby="listExpertModalLabel-{{ $sinistre->id }}" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content shadow">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title">Attribuer à un expert – Sinistre #{{ $sinistre->numero_sinistre }}</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                    </div>
+                    <div class="modal-body">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-dark text-center">
                                 <tr>
-                                    <td>{{ $expert->name }}</td>
-                                    <td>{{ $expert->email }}</td>
-                                    <td>13</td>
-                                    <td>
-                                        <!-- Attribuer un sinistre à un expert -->
-                                        @if ($sinistre->experts->contains($expert->id))
-                                        <div class="btn-group">
-                                             <button class="btn btn-sm btn-outline-success" disabled>
-                                                <i class="bi bi-check-circle-fill">attribué"</i>
-                                            </button>
-                                            <form method="GET" action="{{ route('expert.annulerExpert',  [$sinistre->id, $expert->id]) }}">
-                                                <button class="btn btn-outline-danger">
-                                                    <i class="fas fa-undo"></i>
-                                                </button>
-                                            </form>
-                                        </div>
-                                           
-                                        @else
-                                            <form action="{{ route('expert.attribuerExpert', $sinistre->id) }}" method="POST">
-                                                @csrf
-                                                <input type="hidden" name="expert_id" value="{{ $expert->id }}">
-                                                <button type="submit" class="btn btn-sm btn-success">
-                                                    <i class="bi bi-user-check"></i> Attribuer
-                                                </button>
-                                            </form>
-                                            
-                                        @endif
-                                    </td>
+                                    <th>Nom</th>
+                                    <th>Email</th>
+                                    <th>Sinistres en cours</th>
+                                    <th>Actions</th>
                                 </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody class="text-center">
+                                @forelse($experts as $expert)
+                                    <tr>
+                                        <td>{{ $expert->name }}</td>
+                                        <td>{{ $expert->email }}</td>
+                                        <td><span class="badge bg-secondary">13</span></td>
+                                        <td>
+                                            @if ($sinistre->experts->contains($expert->id))
+                                                <div class="btn-group">
+                                                    <button class="btn btn-sm btn-outline-success" data-bs-toggle="tooltip" title="Déjà attribué" disabled>
+                                                        <i class="fas fa-check-circle"></i>
+                                                    </button>
+                                                    <form method="GET" action="{{ route('expert.annulerExpert',  [$sinistre->id, $expert->id]) }}">
+                                                        <button class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Annuler l'attribution">
+                                                            <i class="fas fa-undo"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            @else
+                                                <form action="{{ route('expert.attribuerExpert', $sinistre->id) }}" method="POST">
+                                                    @csrf
+                                                    <input type="hidden" name="expert_id" value="{{ $expert->id }}">
+                                                    <button type="submit" class="btn btn-sm btn-success" data-bs-toggle="tooltip" title="Attribuer à cet expert">
+                                                        <i class="fas fa-user-plus"></i>
+                                                    </button>
+                                                </form>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted py-4">
+                                            <i class="fas fa-info-circle fa-lg"></i> Aucun expert disponible
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-@endforeach
+    @endforeach
+
+    <!-- Script pour affichage message aucun résultat -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const table = document.getElementById('sinistresTable');
+        const tbody = document.getElementById('sinistresTableBody');
+        const rows = tbody.getElementsByTagName('tr');
+
+        // Ajout du tooltip bootstrap
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+
+        // Message dynamique si aucun résultat
+        const observer = new MutationObserver(() => {
+            const visibleRows = Array.from(rows).filter(row => row.style.display !== 'none');
+            if (visibleRows.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">
+                            <i class="fas fa-search fa-lg"></i> Aucun résultat trouvé
+                        </td>
+                    </tr>
+                `;
+            }
+        });
+
+        observer.observe(tbody, { childList: true, subtree: true });
+    });
+    </script>
+
 
 
 

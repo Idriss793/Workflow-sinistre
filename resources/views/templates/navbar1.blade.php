@@ -7,8 +7,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.4/css/dataTables.dataTables.min.css">
-    <style>
+    
+      <style>
         :root {
         --primary-gradient: linear-gradient(135deg, #9E1B32 0%, #B7323C 100%);
         --secondary-gradient: linear-gradient(135deg, #444444 0%, #666666 100%);
@@ -400,7 +400,7 @@
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li>
-                            <a class="dropdown-item" href="#">
+                            <a class="dropdown-item" href="{{ url('profileExpert') }}">
                                 <i class="fas fa-user-circle"></i>
                                 <span>Mon Profil</span>
                             </a>
@@ -418,15 +418,13 @@
                             </a>
                         </li>
                         <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <form action="{{ route('logout') }}" method="POST">
+                        <form action="{{ route('logout') }}" method="POST">
                                 @csrf
-                                <a class="dropdown-item text-danger" href="#">
-                                    <i class="fas fa-sign-out-alt"></i>
+                                <a class="dropdown-item text-danger" href="#"  onclick="event.preventDefault(); this.closest('form').submit();">
+                                        <i class="fas fa-sign-out-alt"></i>
                                     <span>Déconnexion</span>
                                 </a>
-                            </form>
-                        </li>
+                        </form>
                     </ul>
                 </div>
             </div>
@@ -438,13 +436,13 @@
         <div class="container-fluid">
             <ul class="nav nav-pills justify-content-center justify-content-md-start">
                 <li class="nav-item">
-                    <a class="nav-link {{ Request::is('indexResponsable') ? 'active' : '' }}" href="{{url('indexResponsable')}}">
+                    <a class="nav-link {{ Request::is('indexExpert') ? 'active' : '' }}" href="{{url('indexExpert')}}">
                         <i class="fas fa-tachometer-alt me-2"></i>Dashboard
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ Request::is('listePersonnel') ? 'active' : '' }}" href="{{url('listePersonnel')}}">
-                        <i class="fas fa-user-alt me-2"></i>Personnel
+                    <a class="nav-link {{ Request::is('listeExpertises') ? 'active' : '' }}" href="{{url('listeExpertises')}}">
+                        <i class="fas fa-file-alt me-2"></i>Rapport expertises
                     </a>
                 </li>
                 
@@ -503,52 +501,81 @@
     @yield('content')
 
     <!-- Scripts -->
-     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Gestion active des liens de navigation
-            const currentPath = window.location.pathname;
-            const navLinks = document.querySelectorAll('.nav-link');
+   
+      <script>
+        
+
+        
+
+        // Third party fields toggle
+        function toggleThirdPartyFields() {
+            const checkbox = document.getElementById('has_third_party');
+            const section = document.getElementById('third_party_section');
             
-            navLinks.forEach(link => {
-                if (link.getAttribute('href') === currentPath) {
-                    link.classList.add('active');
-                } else {
-                    link.classList.remove('active');
-                }
-            });
-
-            // Animation du compteur de notifications
-            const notificationCount = document.getElementById('notificationCount');
-            if (notificationCount && parseInt(notificationCount.textContent) > 0) {
-                notificationCount.style.display = 'flex';
+            if (checkbox.checked) {
+                section.classList.remove('d-none');
+            } else {
+                section.classList.add('d-none');
             }
+        }
 
-            // Smooth scroll pour les ancres
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    const target = document.querySelector(this.getAttribute('href'));
-                    if (target) {
-                        target.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start'
-                        });
-                    }
-                });
-            });
-
-            document.querySelector('.dropdown-item.text-danger').addEventListener('click', function(e) {
+        // Form validation
+        document.getElementById('claimForm').addEventListener('submit', function(e) {
+            if (!this.checkValidity()) {
                 e.preventDefault();
-                this.closest('form').submit();
-            });
+                this.classList.add('was-validated');
+            }
+            // sinon, Laravel traitera le formulaire normalement
         });
 
+        // Auto-format license plate to uppercase
+        document.getElementById('num_matri').addEventListener('input', function(e) {
+            this.value = this.value.toUpperCase();
+        });
 
+        document.getElementById('num_matri_tiers').addEventListener('input', function(e) {
+            this.value = this.value.toUpperCase();
+        });
+
+        // Limit date selection to past and present
+        document.getElementById('date_sinistre').setAttribute('max', new Date().toISOString().split('T')[0]);
+
+        // Close sidebar when clicking backdrop
+        document.getElementById('sidebarBackdrop').addEventListener('click', toggleSidebar);
+
+        // Responsive behavior
+        window.addEventListener('resize', function() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            const mainContent = document.getElementById('mainContent');
+            
+            if (window.innerWidth > 768) {
+                backdrop.classList.add('d-none');
+            } else {
+                mainContent.classList.remove('shifted');
+            }
+         
+        });
+
+        // Initialize form validation styles
+        (function() {
+            'use strict';
+            window.addEventListener('load', function() {
+                var forms = document.getElementsByClassName('needs-validation');
+                var validation = Array.prototype.filter.call(forms, function(form) {
+                    form.addEventListener('submit', function(event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
+           
     </script>
-
-    <script src="https://cdn.datatables.net/2.3.4/js/dataTables.min.js"></script>
     @stack('scripts')
 </body>
 </html>

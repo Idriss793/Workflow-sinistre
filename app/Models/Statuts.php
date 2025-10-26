@@ -18,4 +18,8 @@ class Statuts extends Model
     {
         return $this->hasMany(Sinistre::class, 'statut_id');
     }
+    public function expertises()
+    {
+        return $this->hasMany(Expertise::class, 'statut_id');
+    }
 }

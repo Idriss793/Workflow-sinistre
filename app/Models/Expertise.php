@@ -2,25 +2,28 @@
 
 namespace App\Models;
 
-use App\Models\Sinistre;
 use Illuminate\Database\Eloquent\Model;
 
 class Expertise extends Model
 {
-    //
+     //
     protected $fillable = [
         'sinistre_id',
-        'etat_general',
         'estimation_degats',
-        'analyse_dommages',
-        'recommandations',
-        'reparable',
-        'expertise_complementaire',
         'expertise_path',
+        'statut_id',
         'expert_id',
     ];
 
     public function sinistre(){
         return $this->belongsTo(Sinistre::class);
+    }
+    public function expert()
+    {
+        return $this->belongsTo(User::class, 'expert_id');
+    }
+      public function statut()
+    {
+        return $this->belongsTo(Statuts::class, 'statut_id');
     }
 }

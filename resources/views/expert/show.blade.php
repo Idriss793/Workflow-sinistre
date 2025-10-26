@@ -1,4 +1,5 @@
-@extends('templates.navbar2')
+@extends('templates.navbar1')
+
 @section('content')
 <style>
     .img-hover-zoom {
@@ -160,7 +161,7 @@
         </div>
     </div>
 
-    <!-- Onglets Bootstrap -->
+    <!-- Onglets  -->
     <ul class="nav nav-tabs" id="expertTabs" role="tablist">
         <li class="nav-item">
             <button class="nav-link active" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button" role="tab">
@@ -192,332 +193,17 @@
     <!-- Contenu des onglets -->
     <div class="tab-content py-4" id="expertTabsContent">
 
-        <!-- Détails du sinistre -->
-        <div class="tab-pane fade show active" id="details" role="tabpanel">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="fas fa-exclamation-triangle text-warning me-2"></i>Informations du sinistre</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row mb-3">
-                        <div class="col-md-4">
-                            <strong><i class="fas fa-hashtag text-muted me-2"></i>Numéro :</strong><br>
-                            <span class="fs-5 text-primary">{{ $sinistres->numero_sinistre ?? 'N/A' }}</span>
-                        </div>
-                        <div class="col-md-4">
-                            <strong><i class="fas fa-tag text-muted me-2"></i>Type :</strong><br>
-                            <span class="badge bg-secondary">{{ $sinistres->type_sinistre ?? 'Type inconnu' }}</span>
-                        </div>
-                        <div class="col-md-4">
-                            <strong><i class="fas fa-traffic-light text-muted me-2"></i>Statut :</strong><br>
-                            <span class="badge bg-primary">{{ $sinistres->statut->lib_statut ?? 'Statut inconnu' }}</span>
-                        </div>
-                    </div>
-                    <hr>
-                    <div class="mb-3">
-                        <strong><i class="fas fa-align-left text-muted me-2"></i>Description complète :</strong>
-                        <div class="mt-2 p-3 bg-light rounded">
-                            {{ $sinistres->description ?? 'Aucune description disponible' }}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Parties impliquées -->
-        <div class="tab-pane fade" id="parties" role="tabpanel">
-            <div class="row g-4">
-                
-                <!-- Assuré principal -->
-                <div class="col-lg-6">
-                    <div class="card h-100 border-primary">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="mb-0"><i class="fas fa-user-shield me-2"></i>Assuré principal</h5>
-                        </div>
-                        <div class="card-body">
-                            @forelse ($sinistres->assurePrincipals ?? [] as $assure)
-                                <div class="row g-3">
-                                    <div class="col-6">
-                                        <small class="text-muted">Nom</small><br>
-                                        <strong>{{ $assure->nom ?? 'N/A' }}</strong>
-                                    </div>
-                                    <div class="col-6">
-                                        <small class="text-muted">Prénom</small><br>
-                                        <strong>{{ $assure->prenom ?? 'N/A' }}</strong>
-                                    </div>
-                                    <div class="col-6">
-                                        <small class="text-muted">Téléphone</small><br>
-                                        <a href="tel:{{ $assure->num_tel ?? '' }}" class="text-decoration-none">
-                                            <i class="fas fa-phone text-success me-1"></i>{{ $assure->num_tel ?? 'N/A' }}
-                                        </a>
-                                    </div>
-                                    <div class="col-6">
-                                        <small class="text-muted">Police N°</small><br>
-                                        <code>{{ $assure->num_pol ?? 'N/A' }}</code>
-                                    </div>
-                                    <div class="col-12">
-                                        <small class="text-muted">Matricule véhicule</small><br>
-                                        <span class="badge bg-dark">{{ $assure->num_matri ?? 'N/A' }}</span>
-                                    </div>
-                                </div>
-                            @empty
-                                <p class="text-muted">Aucun assuré principal trouvé</p>
-                            @endforelse
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Assuré tiers -->
-                <div class="col-lg-6">
-                    @forelse ($sinistres->assureTiers ?? [] as $assure_tiers)
-                        <div class="card h-100 border-warning mb-3">
-                            <div class="card-header bg-warning text-dark">
-                                <h5 class="mb-0"><i class="fas fa-user-alt me-2"></i>Partie adverse</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="row g-3">
-                                    <div class="col-6">
-                                        <small class="text-muted">Nom</small><br>
-                                        <strong>{{ $assure_tiers->nom_tiers ?? 'N/A' }}</strong>
-                                    </div>
-                                    <div class="col-6">
-                                        <small class="text-muted">Prénom</small><br>
-                                        <strong>{{ $assure_tiers->prenom_tiers ?? 'N/A' }}</strong>
-                                    </div>
-                                    <div class="col-6">
-                                        <small class="text-muted">Téléphone</small><br>
-                                        <a href="tel:{{ $assure_tiers->num_tel_tiers ?? '' }}" class="text-decoration-none">
-                                            <i class="fas fa-phone text-success me-1"></i>{{ $assure_tiers->num_tel_tiers ?? 'N/A' }}
-                                        </a>
-                                    </div>
-                                    <div class="col-6">
-                                        <small class="text-muted">Police N°</small><br>
-                                        <code>{{ $assure_tiers->num_pol_tiers ?? 'N/A' }}</code>
-                                    </div>
-                                    <div class="col-12">
-                                        <small class="text-muted">Matricule</small><br>
-                                        <span class="badge bg-dark">{{ $assure_tiers->num_matri_tiers ?? 'N/A' }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="card border-info">
-                            <div class="card-header bg-info text-white">
-                                <h6 class="mb-0"><i class="fas fa-building me-2"></i>Compagnie d'assurance tiers</h6>
-                            </div>
-                            <div class="card-body">
-                                <p class="mb-2"><strong>Compagnie :</strong> {{ $assure_tiers->nom_assurance_tiers ?? 'N/A' }}</p>
-                                <p class="mb-0"><strong>Contact :</strong> {{ $assure_tiers->contact_assurance_tiers ?? 'N/A' }}</p>
-                            </div>
-                        </div>
-                    @empty
-                        <div class="card h-100 border-warning mb-3">
-                            <div class="card-body text-center">
-                                <p class="text-muted">Aucune partie adverse trouvée</p>
-                            </div>
-                        </div>
-                    @endforelse
-                </div>
-            </div>
-        </div>
-
-        <!-- Photos & Preuves -->
-        <div class="tab-pane fade" id="photos" role="tabpanel">
-            <h5><i class="fas fa-camera text-primary me-2"></i>Galerie photos du sinistre</h5>
-            <p class="text-muted mb-4">Cliquez sur une image pour l'agrandir</p>
-            
-            <div class="row photo-gallery">
-                @forelse(($sinistres->documents ?? collect())->whereIn('type_doc', ['photos']) as $document)
-                    <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                        <div class="card shadow-sm">
-                            <img src="{{ asset('storage/' . $document->path) }}" 
-                                 class="card-img-top img-hover-zoom"
-                                 alt="Photo sinistre"
-                                 data-bs-toggle="modal"
-                                 data-bs-target="#imageModal"
-                                 data-src="{{ asset('storage/' . $document->path) }}">
-                            <div class="card-body p-2">
-                                <small class="text-muted">
-                                    <i class="fas fa-clock me-1"></i>
-                                    {{ \Carbon\Carbon::parse($document->created_at)->format('d/m/Y H:i') }}
-                                </small>
-                            </div>
-                        </div>
-                    </div>
-                @empty
-                    <div class="col-12">
-                        <div class="alert alert-warning">
-                            <i class="fas fa-exclamation-triangle me-2"></i>
-                            Aucune photo n'a été téléchargée pour ce sinistre.
-                        </div>
-                    </div>
-                @endforelse
-            </div>
-        </div>
-
-        <!-- Documents -->
-        <div class="tab-pane fade" id="documents-expert" role="tabpanel">
-            <div class="row">
-                <div class="col-12">
-                    <h5><i class="fas fa-clipboard-list text-primary me-2"></i>État des documents requis</h5>
-                    <ul class="list-group mb-4">
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            Photos des dégâts
-                            <i class="fas fa-check-circle text-success document-status-icon" title="Document reçu"></i>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            Constat amiable signé
-                            <i class="fas fa-times-circle text-danger document-status-icon" title="Document manquant"></i>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            Copie de la carte grise
-                            <i class="fas fa-check-circle text-success document-status-icon" title="Document reçu"></i>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            Relevé d'informations permis
-                            <i class="fas fa-times-circle text-danger document-status-icon" title="Document manquant"></i>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            Devis de réparation
-                            <i class="fas fa-check-circle text-success document-status-icon" title="Document reçu"></i>
-                        </li>
-                    </ul>
-
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title"><i class="fas fa-download text-primary me-2"></i>Documents téléversés</h5>
-                            <div class="table-responsive">
-                                <table class="table table-striped table-sm">
-                                    <thead>
-                                        <tr>
-                                            <th>Type</th>
-                                            <th>Nom</th>
-                                            <th>Taille</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse ($sinistres->documents ?? [] as $document)
-                                        <tr>
-                                            <td>
-                                                <span class="badge bg-secondary">{{ $document->type_doc ?? 'N/A' }}</span>
-                                            </td>
-                                            <td>{{ $document->nom_fichier ?? 'N/A' }}</td>
-                                            <td><small>{{ $document->taille ?? 'N/A' }}</small></td>
-                                            <td>
-                                                <div class="btn-group btn-group-sm">
-                                                    <a href="{{ asset('storage/' . $document->path) }}" target="_blank"
-                                                        class="btn btn-outline-info btn-sm" title="Voir">
-                                                        <i class="fas fa-eye"></i>
-                                                    </a>
-                                                    <a href="{{ asset('storage/' . $document->path) }}" download
-                                                        class="btn btn-outline-success btn-sm" title="Télécharger">
-                                                        <i class="fas fa-download"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        @empty
-                                        <tr>
-                                            <td colspan="4" class="text-center text-muted">Aucun document trouvé</td>
-                                        </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Mon Expertise -->
-        <div class="tab-pane fade" id="expertise" role="tabpanel">
-            <div class="expertise-section">
-                @if (session('status'))
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        <i class="fas fa-check-circle me-2"></i>
-                        {{ session('status') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                @endif
-                <h5><i class="fas fa-tools text-primary me-2"></i>Rapport d'expertise automobile</h5>
-                <p class="text-muted">Rédigez votre rapport d'expertise professionnel</p>
-                
-                <form method="POST" enctype="multipart/form-data" action="{{ route('expert.storeExpertise') }}" id="expertiseForm">
-                    @csrf
-                    {{-- CORRECTION : Supprimer la duplication du champ sinistre_id --}}
-                    <input type="hidden" name="sinistre_id" value="{{ $sinistres->id ?? '' }}">
-                    
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label">État général du véhicule</label>
-                            <select class="form-select" name="etat_general">
-                                <option value="">Sélectionner...</option>
-                                <option value="excellent">Excellent</option>
-                                <option value="bon">Bon</option>
-                                <option value="moyen">Moyen</option>
-                                <option value="mauvais">Mauvais</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Estimation des dégâts</label>
-                            <div class="input-group">
-                                <input type="number" name="estimation_degats" class="form-control" placeholder="0.00" step="0.01" required>
-                                <span class="input-group-text">FCFA</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Analyse des dommages</label>
-                        <textarea class="form-control" rows="4" name="analyse_dommages"
-                        placeholder="Décrivez précisément l'étendue des dégâts, les pièces affectées, la nature des impacts..."></textarea>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Recommandations</label>
-                        <textarea class="form-control" rows="3" name="recommandations"
-                        placeholder="Vos recommandations professionnelles (réparation, remplacement, véhicule économiquement irréparable...)"></textarea>
-                    </div>
-
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <div class="form-check">
-                               
-                                <input class="form-check-input" type="checkbox" name="reparable" id="reparable" value="1">
-                                <label class="form-check-label" for="reparable">
-                                    Véhicule réparable
-                                </label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-check">
-                                    
-                                    <input class="form-check-input" type="checkbox" name="expertise_complementaire" id="reparable" value="1">
-                                    <label class="form-check-label" for="expertise_complementaire">
-                                    Expertise complémentaire requise
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Zone d'upload améliorée -->
-                    <div class="upload-area mb-3 p-3 border rounded text-center" onclick="document.getElementById('documentUpload').click();" style="cursor: pointer;">
-                        <i class="fas fa-upload fa-2x text-primary"></i>
-                        <p class="mt-2">Ajouter un document</p>
-                        <input type="file" class="d-none" id="documentUpload" name="expertise_path">
-                    </div>
-                    
-                    <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary"> {{-- CORRECTION : type="submit" --}}
-                            <i class="fas fa-paper-plane me-2"></i>Envoyer le rapport
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
+        <!-- Infos Sinistre  -->
+        @include('expert.partials.informations')
+        <!--  Partie impliqué  -->
+        @include('expert.partials.partie_implique')
+         <!--  Photos et preuve  -->
+        @include('expert.partials.photos')
+         <!-- Documents  -->
+        @include('expert.partials.documents')
+         <!-- Expertise -->
+        @include('expert.partials.expertise')
+      
     </div>
 </div>
 
@@ -593,5 +279,39 @@ document.addEventListener('DOMContentLoaded', function() {
     
 });
 </script>
+ <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Gestion active des liens de navigation
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            navLinks.forEach(link => {
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
 
+            // Animation du compteur de notifications
+            const notificationCount = document.getElementById('notificationCount');
+            if (notificationCount && parseInt(notificationCount.textContent) > 0) {
+                notificationCount.style.display = 'flex';
+            }
+
+            // Smooth scroll pour les ancres
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
 @endsection

@@ -25,4 +25,10 @@ class ResponsableController extends Controller
         $url='indexResponsable';
         return view('responsable.show',compact('sinistres','title','url'));
     }
+
+    public function showPersonnel(){
+        $title = "Responsable";
+        $url='indexResponsable';
+        return view('responsable.personnel',compact('title','url'));
+    }
 }

@@ -17,6 +17,7 @@ class Document extends Model
         'user_id',
         'assure_id',
         'assure_id_tiers',
+        'passage_id',
         'active',
     ];
 

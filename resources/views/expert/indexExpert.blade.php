@@ -1,22 +1,22 @@
-@extends('templates.navbar')
+@extends('templates.navbar1')
+
+
 @section('content')
-<div class="main-content" id="mainContent">
-    <div class="container mt-5">
-        <!-- Statistiques -->
+
+    <div class="main-content" id="mainContent"> <div class="container mt-5">
+    <!-- ====== Statistiques ====== -->
         <div class="row mb-5">
             <!-- Carte : Sinistres à traiter -->
             <div class="col-md-3">
                 <div class="card bg-primary text-white">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-title mb-0">Sinistres à traiter</h6>
-                                <h2 class="mt-2 mb-0">45</h2>
-                                <p class="mb-0"><small>Ce mois-ci</small></p>
-                            </div>
-                            <div class="icon-circle">
-                                <i class="fas fa-exclamation-triangle fa-2x"></i>
-                            </div>
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-0">Sinistres à traiter</h6>
+                            <h2 class="mt-2 mb-0">45</h2>
+                            <p class="mb-0"><small>Ce mois-ci</small></p>
+                        </div>
+                        <div class="icon-circle">
+                            <i class="fas fa-exclamation-triangle fa-2x"></i>
                         </div>
                     </div>
                 </div>
@@ -25,46 +25,39 @@
             <!-- Carte : Sinistres traités -->
             <div class="col-md-3">
                 <div class="card bg-success text-white">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-title mb-0">Sinistres traités</h6>
-                                <h2 class="mt-2 mb-0">28</h2>
-                                <p class="mb-0"><small>Ce mois-ci</small></p>
-                            </div>
-                            <div class="icon-circle">
-                                <i class="fas fa-check-circle fa-2x"></i>
-                            </div>
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-0">Sinistres traités</h6>
+                            <h2 class="mt-2 mb-0">28</h2>
+                            <p class="mb-0"><small>Ce mois-ci</small></p>
+                        </div>
+                        <div class="icon-circle">
+                            <i class="fas fa-check-circle fa-2x"></i>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <!-- Filtres et recherche -->
-            <div class="row mb-4 mt-4">
-                <div class="col-md-4">
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-search"></i></span>
-                        <input type="text" class="form-control" id="searchInput" placeholder="Rechercher un sinistre...">
-                    </div>
+
+        <!-- ====== Filtres et recherche ====== -->
+        <div class="row mb-4 mt-4">
+            <div class="col-md-4">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    <input type="text" class="form-control" id="searchInput" placeholder="Rechercher un sinistre...">
                 </div>
-                <div class="col-md-3">
-                    <select class="form-select" id="statusFilter">
-                        <option value="">Tous les statuts</option>
-                        <option value="en_attente_de_ducument">En attente de ducument</option>
-                        <option value="en_attente_expertise">En attente attente d'expertise</option>
-                        <option value="en_attente_expertise">En attente d'expert</option>
-                        <option value="en_cours_expertise">En cours d'expertise</option>
-                        <option value="en_attente_validation">En attente validation</option>
-                        <option value="rejete">Rejeté</option>
-                        <option value="cloture">Clôturé</option>
-                    </select>
-                </div>
-                
             </div>
 
-        <!-- Tableau des sinistres -->
+            <div class="col-md-3">
+                <select class="form-select" id="statusFilter">
+                    <option value="">Tous les statuts</option>
+                    <option value="rejeter">Rejeté</option>
+                    <option value="valider">validé</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- ====== Tableau des sinistres ====== -->
         <div class="card">
             <div class="card-body">
                 <div class="table-responsive">
@@ -79,79 +72,129 @@
                                 <th>Actions</th>
                             </tr>
                         </thead>
+
                         <tbody class="text-center" id="sinistresTableBody">
-                            @foreach ($sinistres as $sinistre)
+                            @if($sinistres->isEmpty())
                                 <tr>
-                                    <td>{{$sinistre->numero_sinistre}}</td>
-                                    <td>{{$sinistre->created_at}}</td>
-                                    @foreach ($sinistre->assurePrincipals as $assure)
-                                        <td>{{ $assure->nom }}</td>
-                                    @endforeach
-                                    <td><span class="badge bg-warning">{{$sinistre->statut->lib_statut}}</span></td>
-                                    <td><span class="badge bg-secondary">Non envoyé</span></td>
-                                    <td>
-                                        <a class="btn btn-sm btn-primary" href="{{route('expert.show',$sinistre->id)}}">
-                                            <i class="bi bi-eye"></i> Consulter
-                                        </a>
-                                        <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#rapportModal">
-                                            <i class="bi bi-file-earmark-plus"></i> Envoyer rapport
-                                        </button>
+                                    <td colspan="6" class="text-center text-muted py-4">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        Aucun sinistre à expertiser pour le moment.
                                     </td>
                                 </tr>
-                            @endforeach
+                            @else
+                                @foreach ($sinistres as $sinistre)
+                                    <tr>
+                                        <td>{{ $sinistre->numero_sinistre }}</td>
+                                        <td>{{ $sinistre->created_at->format('d/m/Y') }}</td>
+
+                                        @foreach ($sinistre->assurePrincipals as $assure)
+                                            <td>{{ $assure->nom }}</td>
+                                        @endforeach
+
+                                        <td>
+                                            <span class="badge bg-warning">{{ $sinistre->statut->lib_statut }}</span>
+                                        </td>
+
+                                        <td>
+                                            @if ($sinistre->expertise)
+                                                <span class="badge bg-success">Envoyé</span>
+                                            @else
+                                                <span class="badge bg-secondary">Non envoyé</span>
+                                            @endif
+                                        </td>
+
+                                        <td>
+                                            <a href="{{ route('expert.show', $sinistre->id) }}" class="btn btn-sm btn-primary">
+                                                <i class="fas fa-eye"></i> Consulter
+                                            </a>
+
+                                            <button class="btn btn-sm btn-success"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#rapportModal{{ $sinistre->id }}">
+                                                <i class="fas fa-file-earmark-plus"></i> Envoyer rapport
+                                            </button>
+                                        </td>
+                                    </tr>
+
+                                    <!-- ====== Modal Rapport pour ce sinistre ====== -->
+                                    <div class="modal fade" id="rapportModal{{ $sinistre->id }}" tabindex="-1"
+                                        aria-labelledby="rapportModalLabel{{ $sinistre->id }}" aria-hidden="true">
+                                        <div class="modal-dialog modal-lg">
+                                            <div class="modal-content">
+
+                                                <div class="container mt-4">
+                                                    <div class="card shadow-sm border-0 rounded-3">
+                                                        <div class="card-header bg-primary text-white">
+                                                            <h5 class="mb-0">
+                                                                <i class="fas fa-car-crash me-2"></i>
+                                                                Soumettre un rapport d'expertise
+                                                            </h5>
+                                                        </div>
+
+                                                        <div class="card-body">
+                                                            @if ($errors->any())
+                                                                <div class="alert alert-danger">
+                                                                    <ul class="mb-0">
+                                                                        @foreach ($errors->all() as $error)
+                                                                            <li>{{ $error }}</li>
+                                                                        @endforeach
+                                                                    </ul>
+                                                                </div>
+                                                            @endif
+
+                                                            <form method="POST" action="{{ route('expert.storeExpertise') }}" enctype="multipart/form-data">
+                                                                @csrf
+
+                                                                <!-- ID du sinistre -->
+                                                                <input type="hidden" name="sinistre_id" value="{{ $sinistre->id }}">
+
+                                                                <!-- Estimation -->
+                                                                <div class="mb-3">
+                                                                    <label class="form-label fw-semibold">
+                                                                        <i class="fas fa-money-bill-wave me-1 text-primary"></i>
+                                                                        Estimation des dégâts (en FCFA)
+                                                                    </label>
+                                                                    <div class="input-group">
+                                                                        <input type="number" name="estimation_degats" class="form-control"
+                                                                            placeholder="Ex : 1500000" step="0.01" required>
+                                                                        <span class="input-group-text">FCFA</span>
+                                                                    </div>
+                                                                </div>
+
+                                                                <!-- Fichier expertise -->
+                                                                <div class="mb-3">
+                                                                    <label class="form-label fw-semibold">
+                                                                        <i class="fas fa-file-upload me-1 text-primary"></i>
+                                                                        Joindre le rapport d'expertise (PDF)
+                                                                    </label>
+                                                                    <input type="file" name="expertise_path" accept=".pdf" class="form-control" required>
+                                                                    <div class="form-text text-muted">Formats acceptés : PDF uniquement</div>
+                                                                </div>
+
+                                                                <!-- Bouton d’envoi -->
+                                                                <div class="text-end">
+                                                                    <button type="submit" class="btn btn-primary">
+                                                                        <i class="fas fa-paper-plane me-2"></i>Envoyer le rapport
+                                                                    </button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- ====== Fin du Modal ====== -->
+                                @endforeach
+                            @endif
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
+        <!-- ====== Fin du tableau ====== -->
+
     </div>
-</div>
-
-<!-- Modal Rapport -->
-<div class="modal fade" id="rapportModal" tabindex="-1" aria-labelledby="rapportModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <form action="#" method="POST" enctype="multipart/form-data">
-        @csrf
-        <div class="modal-header">
-          <h5 class="modal-title" id="rapportModalLabel">Envoyer le rapport d'expertise</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
-        </div>
-        <div class="modal-body">
-          <!-- Upload de fichier -->
-          <div class="mb-3">
-            <label for="rapportFile" class="form-label">Joindre un fichier (PDF, DOCX)</label>
-            <input type="file" name="rapportFile" id="rapportFile" class="form-control">
-          </div>
-
-          <hr class="my-3">
-
-          <!-- Rédiger le rapport -->
-          <div class="mb-3">
-            <label for="observations" class="form-label">Observations</label>
-            <textarea name="observations" id="observations" class="form-control" rows="3"></textarea>
-          </div>
-
-          <div class="mb-3">
-            <label for="estimation" class="form-label">Estimation des réparations (€)</label>
-            <input type="number" name="estimation" id="estimation" class="form-control">
-          </div>
-
-          <div class="mb-3">
-            <label for="conclusion" class="form-label">Conclusion</label>
-            <select name="conclusion" id="conclusion" class="form-select">
-              <option value="reparable">Réparable</option>
-              <option value="epave">Épave</option>
-              <option value="a_completer">À compléter</option>
-            </select>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-success">Envoyer</button>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-        </div>
-      </form>
     </div>
-  </div>
-</div>
 @endsection
