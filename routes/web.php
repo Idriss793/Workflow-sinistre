@@ -17,7 +17,7 @@ use App\Http\Controllers\ResponsableController;
 use App\Http\Controllers\assurePrincipalController;
 
 Route::get('/', function () {
-    return redirect()->route('auth.login');
+    return redirect()->route('auth.connection');
 });
 
 // Routes publiques (connexion / inscription)
@@ -49,7 +49,8 @@ Route::middleware('auth')->group(function () {
         Route::put('/updateAssurePrincipal/{id}', [assurePrincipalController::class, 'updateAssurePrincipal'])->name('assurePrincipal.update');
         Route::put('/updateAssureTiers/{id}', [assureTiersController::class, 'updateAssureTiers'])->name('assureTiers.update');
         Route::post('/storeAssureTiers', [assureTiersController::class, 'storeAssureTiers'])->name('assureTiers.ajouter');
-  
+        Route::put('/profileGestionnaire', [SinistreController::class, 'updateProfile'])->name('profileGestionnaire.update');
+
 
 
 
@@ -63,19 +64,28 @@ Route::middleware('auth')->group(function () {
 
     // Interface expert
     Route::middleware('role:expert')->group(function () {
+        Route::get('/search', [ExpertController::class, 'search'])->name('expert.search');
         Route::get('/profileExpert', [ExpertController::class, 'profile'])->name('expert.profile');
         Route::get('/indexExpert', [ExpertController::class, 'index'])->name('expert.index');
         Route::get('/listeExpertises', [ExpertController::class, 'listeExpertises'])->name('expert.listeExpertises');
         Route::get('/expert/sinistres/{id}', [ExpertController::class, 'show'])->name('expert.show');
         Route::post('/storeExpertise', [ExpertController::class, 'storeExpertise'])->name('expert.storeExpertise');
+        Route::get('/passageExpert/{id}', [PassageController::class, 'show'])->name('passages.show');
+        Route::put('/profileExpert', [ExpertController::class, 'updateProfile'])->name('profileExpert.update');
     });
 
     // Interface responsable
     Route::middleware('role:responsable')->group(function () {
+        Route::get('/searchResponsable', [ResponsableController::class, 'search'])->name('responsable.search');
         Route::get('/indexResponsable', [ResponsableController::class, 'index'])->name('responsable.index');
         Route::get('/responsable/sinistres/{id}', [ResponsableController::class, 'show'])->name('responsable.show');
         Route::get('/listePersonnel', [ResponsableController::class, 'showPersonnel'])->name('responsable.showPersonnel');
         Route::get('/register', [UserController::class, 'showRegisterForm'])->name('auth.register');
+        Route::get('/passages/{id}', [PassageController::class, 'show'])->name('passages.show');
+        Route::get('/profileResponsable', [ResponsableController::class, 'profile'])->name('responsable.profile');
+        Route::put('/profileResponsable', [ResponsableController::class, 'updateProfile'])->name('profileResponsable.update');
+
+
 
     });
 

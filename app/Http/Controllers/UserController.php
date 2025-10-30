@@ -15,7 +15,8 @@ class UserController extends Controller
     public function showRegisterForm(){
         $title = "Responsable";
         $url='indexResponsable';
-        return view('auth.register',compact('title','url'));
+        $user = Auth::user();
+        return view('auth.register',compact('title','url','user'));
     }
 
     public function login(Request $request)

@@ -50,7 +50,7 @@
         </li>
         <li class="nav-item">
             <button class="nav-link" id="assure-tiers-tab" data-bs-toggle="tab" data-bs-target="#assure-tiers" type="button" role="tab">
-                Assuré tiers
+               Partie impliqué
             </button>
         </li>
         <li class="nav-item">
@@ -58,11 +58,11 @@
                 Documents
             </button>
         </li>
+        
     </ul>
 
     <!-- Contenu des onglets -->
-    <div class="tab-content py-4" id="sinistreTabsContent">
-
+    <div class="tab-content" id="sinistreTabsContent">
         <!-- Infos Sinistre -->
         @include('responsable.partials.infos_sinistre')
 
@@ -75,6 +75,39 @@
 
         <!-- Documents -->
         @include('responsable.partials.documents')
+
+
     </div>
 </div>
 @endsection
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Active les tooltips Bootstrap
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(el => new bootstrap.Tooltip(el));
+
+    // Gestion du dernier onglet ouvert (persistance)
+    const tabKey = 'activeSinistreTab';
+    const storedTab = localStorage.getItem(tabKey);
+
+    // Si un onglet a été enregistré, on le restaure
+    // if (storedTab) {
+    //     const someTabTriggerEl = document.querySelector(`#sinistreTabs button[data-bs-target="${storedTab}"]`);
+    //     if (someTabTriggerEl) {
+    //         const tab = new bootstrap.Tab(someTabTriggerEl);
+    //         tab.show();
+    //     }
+    // }
+
+    // Lorsqu’un onglet est cliqué, on le sauvegarde
+    // document.querySelectorAll('#sinistreTabs button[data-bs-toggle="tab"]').forEach(tabEl => {
+    //     tabEl.addEventListener('shown.bs.tab', event => {
+    //         const target = event.target.getAttribute('data-bs-target');
+    //         localStorage.setItem(tabKey, target);
+    //     });
+    // });
+});
+</script>
+@endpush
+

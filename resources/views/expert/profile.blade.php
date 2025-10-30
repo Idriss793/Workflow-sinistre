@@ -1,110 +1,130 @@
 @extends('templates.navbar1')
 
-
-
 @section('content')
-    <div class="container py-5">
-        <!-- ====== Titre de la page ====== -->
-        <div class="mb-4">
-            <h2 class="fw-bold text-dark">
-                <i class="fas fa-user-circle me-2 text-primary"></i> Mon profil
-            </h2>
-            <hr class="mt-3">
-        </div>
+<div class="container py-5">
+    <!-- ====== Titre de la page ====== -->
+    <div class="mb-4">
+        <h2 class="fw-bold text-dark">
+            <i class="fas fa-user-circle me-2 text-primary"></i> Mon profil
+        </h2>
+        <hr class="mt-3">
+    </div>
 
-        <!-- ====== Section Profil ====== -->
-        <div class="row justify-content-center">
-            <div class="col-lg-8 col-md-10">
-                <div class="card border-0 shadow-sm rounded-4">
-                    <div class="card-body p-5">
+    <!-- ====== Section Profil ====== -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-5">
 
-                        <!-- ====== Avatar / En-tête ====== -->
-                        <div class="text-center mb-5">
-                            <div class="rounded-circle bg-primary bg-opacity-10 text-primary fw-bold fs-1 d-inline-flex justify-content-center align-items-center mb-3" 
-                                style="width: 120px; height: 120px;">
-                                M
+                    <!-- ====== Avatar / En-tête ====== -->
+                    <div class="text-center mb-5">
+                        <div class="rounded-circle bg-primary bg-opacity-10 text-primary fw-bold fs-1 d-inline-flex justify-content-center align-items-center mb-3" 
+                            style="width: 120px; height: 120px;">
+                            {{ strtoupper(substr($user->name,0,1)) }}{{ strtoupper(substr($user->first_name,0,1)) }}
+                        </div>
+                        <h4 class="fw-bold text-dark mb-0">{{ $user->name }} {{ $user->first_name }}</h4>
+                        <p class="text-muted mb-0">{{ $user->email }}</p>
+                    </div>
+
+                    <!-- ====== Formulaire Profil ====== -->
+
+                    @if (session('success'))
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    @endif
+
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <ul class="mb-0">
+                                @foreach ($errors->all() as $error)
+                                    <li><i class="fas fa-exclamation-circle me-2"></i>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+
+                    <form method="POST" action="{{ route('profileExpert.update') }}">
+                        @csrf
+                        @method('PUT')
+
+                        <div class="px-2 mb-4">
+                            <div class="row mb-3">
+                                <label class="col-sm-4 text-secondary fw-semibold">Nom complet :</label>
+                                <div class="col-sm-8">
+                                    <input type="text" name="name" class="form-control" value="{{ $user->name }}">
+                                </div>
                             </div>
-                            <h4 class="fw-bold text-dark mb-0">Mon Nom</h4>
-                            <p class="text-muted mb-0">monemail@example.com</p>
+
+                            <div class="row mb-3">
+                                <label class="col-sm-4 text-secondary fw-semibold">Email :</label>
+                                <div class="col-sm-8">
+                                    <input type="email" name="email" class="form-control" value="{{ $user->email }}">
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label class="col-sm-4 text-secondary fw-semibold">Téléphone :</label>
+                                <div class="col-sm-8">
+                                    <input type="text" name="phone_number" class="form-control" value="{{ $user->phone_number ?? '' }}">
+                                </div>
+                            </div>
+
+
+                            <div class="row mb-3">
+                                <label class="col-sm-4 text-secondary fw-semibold">Mot de passe actuel :</label>
+                                <div class="col-sm-8">
+                                    <input type="password" name="current_password" class="form-control" placeholder="Entrez votre mot de passe actuel">
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label class="col-sm-4 text-secondary fw-semibold">Nouveau mot de passe :</label>
+                                <div class="col-sm-8">
+                                    <input type="password" name="new_password" class="form-control" placeholder="Entrez le nouveau mot de passe">
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label class="col-sm-4 text-secondary fw-semibold">Statut :</label>
+                                <div class="col-sm-8">
+                                    <span class="{{ $user->is_active ? 'text-success' : 'text-danger' }}">
+                                        {{ $user->is_active ? 'Actif' : 'Inactif' }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-sm-4 text-secondary fw-semibold">Rôle :</div>
+                                <div class="col-sm-8 text-dark">
+                                    {{ $user->role_id == 1 ? 'Administrateur' : 'Utilisateur Gestionnaire' }}
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label class="col-sm-4 text-secondary fw-semibold">Date d’inscription :</label>
+                                <div class="col-sm-8 text-dark">
+                                    {{ $user->created_at->format('d M Y') }}
+                                </div>
+                            </div>
                         </div>
 
-                        <!-- ====== Formulaire Profil ====== -->
-                        <form>
-                            <div class="px-2 mb-4">
-                                <div class="row mb-3">
-                                    <label class="col-sm-4 text-secondary fw-semibold">Nom complet :</label>
-                                    <div class="col-sm-8">
-                                        <input type="text" name="name" class="form-control" value="Mon Nom">
-                                    </div>
-                                </div>
+                        <hr>
 
-                                <div class="row mb-3">
-                                    <label class="col-sm-4 text-secondary fw-semibold">Email :</label>
-                                    <div class="col-sm-8">
-                                        <input type="email" name="email" class="form-control" value="monemail@example.com">
-                                    </div>
-                                </div>
+                        <!-- ====== Boutons ====== -->
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary rounded-pill px-4 me-2">
+                                <i class="fas fa-save me-1"></i> Sauvegarder
+                            </button>
 
-                                <div class="row mb-3">
-                                    <label class="col-sm-4 text-secondary fw-semibold">Téléphone :</label>
-                                    <div class="col-sm-8">
-                                        <input type="text" name="telephone" class="form-control" value="07 00 00 00 00">
-                                    </div>
-                                </div>
+                        </div>
+                    </form>
 
-                                <div class="row mb-3">
-                                    <label class="col-sm-4 text-secondary fw-semibold">Adresse :</label>
-                                    <div class="col-sm-8">
-                                        <input type="text" name="adresse" class="form-control" value="Libreville, Gabon">
-                                    </div>
-                                </div>
-
-                                <div class="row mb-3">
-                                    <label class="col-sm-4 text-secondary fw-semibold">Mot de passe actuel :</label>
-                                    <div class="col-sm-8">
-                                        <input type="password" name="current_password" class="form-control" placeholder="Entrez votre mot de passe actuel">
-                                    </div>
-                                </div>
-
-                                <div class="row mb-3">
-                                    <label class="col-sm-4 text-secondary fw-semibold">Nouveau mot de passe :</label>
-                                    <div class="col-sm-8">
-                                        <input type="password" name="new_password" class="form-control" placeholder="Entrez le nouveau mot de passe">
-                                    </div>
-                                </div>
-
-                                <div class="row mb-3">
-                                    <label class="col-sm-4 text-secondary fw-semibold">Statut :</label>
-                                    <div class="col-sm-8">
-                                        <span class="text-success fw-semibold">Actif</span>
-                                    </div>
-                                </div>
-                                <div class="row mb-3">
-                                    <div class="col-sm-4 text-secondary fw-semibold">Rôle :</div>
-                                    <div class="col-sm-8 text-dark">Utilisateur Expert</div>
-                                </div>
-                                <div class="row mb-3">
-                                    <label class="col-sm-4 text-secondary fw-semibold">Date d’inscription :</label>
-                                    <div class="col-sm-8 text-dark">23 Oct 2025</div>
-                                </div>
-                            </div>
-
-                            <hr>
-
-                            <!-- ====== Boutons ====== -->
-                            <div class="text-center">
-                                <button type="button" class="btn btn-primary rounded-pill px-4 me-2">
-                                    <i class="fas fa-save me-1"></i> Sauvegarder
-                                </button>
-                                <button type="button" class="btn btn-outline-secondary rounded-pill px-4">
-                                    <i class="fas fa-sign-out-alt me-1"></i> Déconnexion
-                                </button>
-                            </div>
-                        </form>
-
-                    </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 @endsection

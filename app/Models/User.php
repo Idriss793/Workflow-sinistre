@@ -39,7 +39,7 @@ class User extends Authenticatable
 
     //relation entre utilisateur expert et sinistre
     public function sinistresExpert(){
-        return $this->belongsToMany(Sinistre::class, 'sinistre_user', 'sinistre_id', 'user_id')
+        return $this->belongsToMany(Sinistre::class, 'sinistre_user','user_id','sinistre_id')
         ->withTimestamps();
     }
 

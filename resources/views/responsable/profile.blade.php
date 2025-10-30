@@ -1,4 +1,4 @@
-@extends('templates.navbar2')
+@extends('templates.navbar3')
 
 @section('content')
 <div class="container py-5">
@@ -27,7 +27,7 @@
                     </div>
 
                     <!-- ====== Formulaire Profil ====== -->
-                    <form method="POST" action="{{ route('profileGestionnaire.update') }}">
+                    <form method="POST" action="{{ route('profileResponsable.update') }}">
                         @csrf
                         @method('PUT')
 
@@ -99,7 +99,6 @@
                             <button type="submit" class="btn btn-primary rounded-pill px-4 me-2">
                                 <i class="fas fa-save me-1"></i> Sauvegarder
                             </button>
-
                         </div>
                     </form>
 

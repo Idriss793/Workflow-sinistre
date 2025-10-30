@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Statuts;
 use App\Models\Document;
@@ -12,6 +13,8 @@ use Illuminate\Http\Request;
 use App\Models\AssureSinistre;
 use App\Models\AssurePrincipal;
 use App\Models\AssureTiersSinistre;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class SinistreController  extends Controller
 {
@@ -19,14 +22,15 @@ class SinistreController  extends Controller
     public function index(Request $request){
         $title = "Gestionnaire";
         $url='home';
-        return view('gestionnaires.formDeclarationSinistre',compact('title','url'));
+        $user = Auth::user();
+        return view('gestionnaires.formDeclarationSinistre',compact('title','url','user'));
     }
     public function declarerSinistre(Request $request){
        
         $title = "Gestionnaire";
         $url='home';
-
-        return view('gestionnaires.declarerSinistre',compact('title','url'));
+        $user = Auth::user();
+        return view('gestionnaires.declarerSinistre',compact('title','url','user'));
     }
 
 
@@ -34,7 +38,10 @@ class SinistreController  extends Controller
     // avec la liste des sinistre a traite et les défférents filtre
     
     public function home(Request $request){
-        $query = Sinistre::with(['assurePrincipals','statut','experts']);
+        $query = Sinistre::with(['assurePrincipals','statut','experts'])
+            ->where('user_id',auth()->user()->id)
+             ->orderBy('created_at', 'desc')
+        ;
         
         // Recherche globale : nom assuré OU numéro sinistre
         $query->when($request->search, function($q) use ($request){
@@ -66,19 +73,83 @@ class SinistreController  extends Controller
 
         //Liste des experts
         $experts = User::with('role')
-            ->whereHas('role',function ($query){
-                $query->where('lib_role','expert');
-            })
+        ->whereHas('role', function ($query) {
+            $query->where('lib_role', 'expert');
+        })
+        ->withCount([
+            'sinistresExpert as sinistres_en_cours_de_traitement' => function ($q) {
+                $q->whereHas('statut', function ($sub) {
+                    $sub->whereIn('ordre_statut', ['3', '6']);
+                });
+            }
+        ])
         ->get();
+    // ======================
+    //  Calcul période
+    // ======================
+    $maintenant = Carbon::now();
+
+    if ($request->filled('mois')) {
+        // Cas : mois spécifique
+        $debut = Carbon::create($maintenant->year, $request->mois, 1);
+        $fin = $debut->copy()->endOfMonth();
+    } else {
+        switch ($request->periode) {
+            case '1_semaine':
+                $debut = $maintenant->copy()->subWeek();
+                break;
+            case '3_mois':
+                $debut = $maintenant->copy()->subMonths(3);
+                break;
+            case '1_an':
+                $debut = $maintenant->copy()->subYear();
+                break;
+            case '1_mois':
+            default:
+                $debut = $maintenant->copy()->subMonth();
+                break;
+        }
+        $fin = $maintenant;
+    }
+
+    // ======================
+    //  Données Dashboard
+    // ======================
+    $sinistres_declares = Sinistre::where('user_id', auth()->user()->id)
+        ->whereBetween('created_at', [$debut, $fin])
+        ->count();
+
+    $sinistres_clotures = Sinistre::where('user_id', auth()->user()->id)
+        ->whereBetween('updated_at', [$debut, $fin])
+        ->whereHas('statut', function ($q) {
+            $q->where('lib_statut', 'clôturé')
+              ->orWhere('ordre_statut', '7');
+        })
+        ->count();
+
+    $en_attente = Sinistre::where('user_id', auth()->user()->id)
+        ->whereHas('statut', function ($q) {
+            $q->where('lib_statut', 'en attente')
+              ->orWhere('ordre_statut', '6');
+        })
+        ->count();
+
+    $taux_cloture = $sinistres_declares > 0
+        ? round(($sinistres_clotures / $sinistres_declares) * 100)
+        : 0;
+
         //titre
         $title="Gestionnaire";
         $url='home';
-
-        return view('gestionnaires.listeSinistre',compact('sinistres','title','experts','url'));
+        $user = Auth::user();
+        return view('gestionnaires.listeSinistre',compact('sinistres',
+        'title', 'experts', 'url', 'user','sinistres_declares',
+        'sinistres_clotures', 'taux_cloture', 'en_attente'));
     }
   
 
     public function store(Request $request){
+
         $request->validate([
             'nom' => 'required|string',
             'prenom' => 'required|string',
@@ -97,7 +168,7 @@ class SinistreController  extends Controller
             'nom_assurance_tiers'=> 'nullable|string',
             'contact_assurance_tiers'=> 'nullable|string',
         ]);
-
+       
         $statut= Statuts::find('1');
 
 
@@ -107,6 +178,7 @@ class SinistreController  extends Controller
             'statut_id'=> $statut-> id,
             'type_sinistre' => $request -> type_sinistre,
             'description' => $request -> description,
+            'user_id' => Auth()->id(),
         ]);
 
         $Assure_principal = AssurePrincipal::create([
@@ -139,15 +211,29 @@ class SinistreController  extends Controller
 
         //Liste des experts
         $experts = User::with('role')
-            ->whereHas('role',function ($query){
-                $query->where('lib_role','expert');
-            }) ->get();
+        ->whereHas('role', function ($query) {
+            $query->where('lib_role', 'expert');
+        })
+        ->withCount([
+            'sinistresExpert as sinistres_en_cours_de_traitement' => function ($q) {
+                $q->whereHas('statut', function ($sub) {
+                    $sub->whereIn('ordre_statut', ['3', '6']);
+                });
+            }
+        ])
+        ->get();
+
+
+
+            
         $sinistres = Sinistre::with(['assurePrincipals','statut'])
+          ->where('user_id',auth()->user()->id)
          ->orderBy('created_at', 'desc')
          ->paginate(10);
         $title = "Gestionnaire";
         $url='home';
-        return view('gestionnaires.listeSinistre',compact('sinistres','experts','title','url'))->with('status','Sinistre déclarer avec succès');
+        $user = Auth::user();
+        return view('gestionnaires.listeSinistre',compact('sinistres','experts','title','url','user'))->with('status','Sinistre déclarer avec succès');
     }
 
     public function show(string $id)
@@ -188,12 +274,13 @@ class SinistreController  extends Controller
         }
         $title = "Gestionnaire";
         $url='home';
+        $user = Auth::user();
          // Récupération des passagers associés à ce sinistre
             $passages = $sinistres->passagers()->paginate(10);
 
         $conducteurExiste = $sinistres->passagers()->where('type_passager', 'conducteur')->exists();
 
-        return view('gestionnaires.index', compact('sinistres', 'manquants', 'passages','nomsDocuments', 'title','url', 'conducteurExiste'));
+        return view('gestionnaires.index', compact('sinistres', 'manquants', 'passages','nomsDocuments', 'title','url', 'conducteurExiste', 'user'));
     }
 
 
@@ -241,6 +328,43 @@ class SinistreController  extends Controller
     public function profileGestionnaire(Request $request){
         $title = "Gestionnaire";
         $url='home';
-        return view('gestionnaires.profile',compact('title','url'));
+        $user = Auth::user();
+        return view('gestionnaires.profile',compact('title','url','user'));
+    }
+
+    public function updateProfile(Request $request){
+        $user = Auth::user();
+
+        // Validation des champs
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'phone_number' => 'nullable|string|max:20',
+            'current_password' => 'nullable|string',
+            'new_password' => 'nullable|string|min:6',
+        ]);
+
+        
+
+        // Mise à jour des autres informations
+        $user->fill([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'phone_number' => $validated['phone_number'] ?? $user->phone_number,
+        ]);
+
+        // Si un nouveau mot de passe est saisi, on vérifie l'ancien
+        if (!empty($validated['new_password'])) {
+            if (!Hash::check($validated['current_password'], $user->password)) {
+                return back()->withErrors(['current_password' => 'Le mot de passe actuel est incorrect.']);
+            }
+
+            $user->password = Hash::make($validated['new_password']);
+        }
+        // Sauvegarde
+        $user->save();
+
+        // Retour avec message de succès
+        return back()->with('success', 'Profil mis à jour avec succès.');
     }
 }

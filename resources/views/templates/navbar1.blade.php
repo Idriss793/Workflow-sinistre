@@ -393,7 +393,7 @@
                             <i class="fas fa-user"></i>
                         </div>
                         <div class="user-info d-none d-md-block">
-                            <div class="user-name">Mr. Jean Does</div>
+                            <div class="user-name">{{$user->name}}</div>
                             <div class="user-role">{{$title}} Automobile</div>
                         </div>
                         <i class="fas fa-chevron-down ms-2 d-none d-md-inline"></i>
@@ -405,7 +405,7 @@
                                 <span>Mon Profil</span>
                             </a>
                         </li>
-                        <li>
+                        <!-- <li>
                             <a class="dropdown-item" href="#">
                                 <i class="fas fa-cog"></i>
                                 <span>Paramètres</span>
@@ -416,7 +416,7 @@
                                 <i class="fas fa-chart-line"></i>
                                 <span>Statistiques</span>
                             </a>
-                        </li>
+                        </li> -->
                         <li><hr class="dropdown-divider"></li>
                         <form action="{{ route('logout') }}" method="POST">
                                 @csrf

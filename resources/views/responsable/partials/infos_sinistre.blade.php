@@ -1,4 +1,5 @@
 <div class="tab-pane fade show active" id="info" role="tabpanel">
+
     <div class="card mb-4">
         <div class="card-header d-flex justify-content-between">
             <h5 class="mb-0">Informations sur le sinistre</h5>
@@ -34,4 +35,5 @@
             </div>
         @endforeach
     </div>
+    
 </div>

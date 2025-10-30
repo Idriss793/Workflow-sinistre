@@ -17,8 +17,8 @@ class Passage extends Model
 
     public function sinistres()
     {
-        return $this->belongsToMany(Sinistre::class, 'passager_sinistre')
-                    ->withTimestamps();
+        return $this->belongsToMany(Sinistre::class, 'passager_sinistre', 'passage_id', 'sinistre_id')
+            ->withTimestamps();
     }
 
     

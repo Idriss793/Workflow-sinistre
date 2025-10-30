@@ -28,79 +28,78 @@
 <!-- Dashboard avec indicateurs -->
 <div class="container mt-5">
     <div class="row mb-5">
-        <!-- Carte : Sinis tres déclarés -->
+        <form method="GET" action="{{ route('gestionnaire.home') }}" class="mb-4">
+            <div class="row align-items-end">
+                <div class="col-md-3">
+                    <label for="periode">Période :</label>
+                    <select name="periode" id="periode" class="form-select">
+                        <option value="1_semaine" {{ request('periode') == '1_semaine' ? 'selected' : '' }}>Dernière semaine</option>
+                        <option value="1_mois" {{ request('periode') == '1_mois' ? 'selected' : '' }}>Dernier mois</option>
+                        <option value="3_mois" {{ request('periode') == '3_mois' ? 'selected' : '' }}>3 derniers mois</option>
+                        <option value="1_an" {{ request('periode') == '1_an' ? 'selected' : '' }}>Dernière année</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label for="mois">Mois spécifique :</label>
+                    <select name="mois" id="mois" class="form-select">
+                        <option value="">-- Tous les mois --</option>
+                        @foreach (range(1, 12) as $mois)
+                            <option value="{{ $mois }}" {{ request('mois') == $mois ? 'selected' : '' }}>
+                                {{ \Carbon\Carbon::create()->month($mois)->locale('fr')->monthName }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Filtrer</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="row mb-5">
         <div class="col-md-3">
             <div class="card bg-primary text-white">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="card-title mb-0">Sinistres déclarés</h6>
-                            <h2 class="mt-2 mb-0">45</h2>
-                            <p class="mb-0"><small>Ce mois-ci</small></p>
-                            
-                        </div>
-                        <div class="icon-circle">
-                            <i class="fas fa-exclamation-triangle fa-2x"></i>
-                        </div>
-                    </div>
+                    <h6 class="card-title mb-0">Sinistres déclarés</h6>
+                    <h2 class="mt-2 mb-0">{{ $sinistres_declares }}</h2>
+                    <p class="mb-0"><small>---------</small></p>
                 </div>
             </div>
         </div>
-        
-        <!-- Carte : Sinistres clôturés -->
+
         <div class="col-md-3">
             <div class="card bg-success text-white">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="card-title mb-0">Sinistres clôturés</h6>
-                            <h2 class="mt-2 mb-0">28</h2>
-                            <p class="mb-0"><small>Ce mois-ci</small></p>
-                        </div>
-                        <div class="icon-circle">
-                            <i class="fas fa-check-circle fa-2x"></i>
-                        </div>
-                    </div>
+                    <h6 class="card-title mb-0">Sinistres clôturés</h6>
+                    <h2 class="mt-2 mb-0">{{ $sinistres_clotures }}</h2>
+                    <p class="mb-0"><small>---------</small></p>
                 </div>
             </div>
         </div>
-        
-        <!-- Carte : Taux de clôture -->
+
         <div class="col-md-3">
             <div class="card bg-info text-white">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="card-title mb-0">Taux de clôture</h6>
-                            <h2 class="mt-2 mb-0">62%</h2>
-                            <p class="mb-0"><small>Performance</small></p>
-                        </div>
-                        <div class="icon-circle">
-                            <i class="fas fa-chart-line fa-2x"></i>
-                        </div>
-                    </div>
+                    <h6 class="card-title mb-0">Taux de clôture</h6>
+                    <h2 class="mt-2 mb-0">{{ $taux_cloture }}%</h2>
+                    <p class="mb-0"><small>Performance</small></p>
                 </div>
             </div>
         </div>
-        
-        <!-- Carte : En attente validation -->
+
         <div class="col-md-3">
             <div class="card bg-warning text-dark">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="card-title mb-0">En attente validation</h6>
-                            <h2 class="mt-2 mb-0">12</h2>
-                            <p class="mb-0"><small>À traiter</small></p>
-                        </div>
-                        <div class="icon-circle">
-                            <i class="fas fa-clock fa-2x"></i>
-                        </div>
-                    </div>
+                    <h6 class="card-title mb-0">En attente validation</h6>
+                    <h2 class="mt-2 mb-0">{{ $en_attente }}</h2>
+                    <p class="mb-0"><small>À traiter</small></p>
                 </div>
             </div>
         </div>
     </div>
+
 
 
     <div class="row mb-4 mt-4">
@@ -121,8 +120,10 @@
                         <option value="1" {{ request('statut')=='1' ? 'selected' : '' }}>En attente de document</option>
                         <option value="2" {{ request('statut')=='2' ? 'selected' : '' }}>En attente expert</option>
                         <option value="3" {{ request('statut')=='3' ? 'selected' : '' }}>En attente expertise</option>
+                        <option value="6" {{ request('statut')=='6' ? 'selected' : '' }}>En attente de validation</option>
                         <option value="4" {{ request('statut')=='4' ? 'selected' : '' }}>Rejeté</option>
-                        <option value="5" {{ request('statut')=='5' ? 'selected' : '' }}>Clôturé</option>
+                        <option value="5" {{ request('statut')=='5' ? 'selected' : '' }}>Validé</option>
+                        <option value="7" {{ request('statut')=='7' ? 'selected' : '' }}>Clôturé</option>
                     </select>
                 </div>
 
@@ -321,7 +322,7 @@
                                     <tr>
                                         <td>{{ $expert->name }}</td>
                                         <td>{{ $expert->email }}</td>
-                                        <td><span class="badge bg-secondary">13</span></td>
+                                        <td><span class="badge bg-secondary">{{$expert->sinistres_en_cours_de_traitement ?? 0}} </span></td>
                                         <td>
                                             @if ($sinistre->experts->contains($expert->id))
                                                 <div class="btn-group">
@@ -390,9 +391,4 @@
         observer.observe(tbody, { childList: true, subtree: true });
     });
     </script>
-
-
-
-
-
 @endsection

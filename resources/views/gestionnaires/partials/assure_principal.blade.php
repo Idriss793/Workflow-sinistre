@@ -48,7 +48,7 @@
         </div>
     </div>
 
-    <!-- Exemple de modal d’édition -->
+    
     <div class="modal fade" id="modifierAssureModal{{ $assure->id }}" tabindex="-1" aria-labelledby="modifierAssureModalLabel{{ $assure->id }}" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">

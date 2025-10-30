@@ -66,6 +66,12 @@ class Sinistre extends Model
         ->withTimestamps();
     }
 
+     //relation entre utilisateur expert et sinistre
+    public function gestionnaire(){
+        return $this->belongsToMany(User::class, 'sinistre_user', 'sinistre_id', 'user_id')
+        ->withTimestamps();
+    }
+
     //relation entre expertise et sinistre
     public function expertise(){
         return $this->hasMany(Expertise::class,'sinistre_id');
@@ -73,7 +79,7 @@ class Sinistre extends Model
 
      public function passagers()
     {
-        return $this->belongsToMany(Passage::class, 'passager_sinistre')
+        return $this->belongsToMany(Passage::class, 'passager_sinistre', 'sinistre_id', 'passage_id')
                     ->withTimestamps();
     }
 }

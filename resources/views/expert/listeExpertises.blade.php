@@ -4,58 +4,35 @@
 @section('content')
 
     <div class="main-content" id="mainContent"> <div class="container mt-5">
-    <!-- ====== Statistiques ====== -->
-        <div class="row mb-5">
-            <!-- Carte : Sinistres à traiter -->
-            <div class="col-md-3">
-                <div class="card bg-primary text-white">
-                    <div class="card-body d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="card-title mb-0">Sinistres à traiter</h6>
-                            <h2 class="mt-2 mb-0">45</h2>
-                            <p class="mb-0"><small>Ce mois-ci</small></p>
-                        </div>
-                        <div class="icon-circle">
-                            <i class="fas fa-exclamation-triangle fa-2x"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Carte : Sinistres traités -->
-            <div class="col-md-3">
-                <div class="card bg-success text-white">
-                    <div class="card-body d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="card-title mb-0">Sinistres traités</h6>
-                            <h2 class="mt-2 mb-0">28</h2>
-                            <p class="mb-0"><small>Ce mois-ci</small></p>
-                        </div>
-                        <div class="icon-circle">
-                            <i class="fas fa-check-circle fa-2x"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        
 
         <!-- ====== Filtres et recherche ====== -->
-        <div class="row mb-4 mt-4">
-            <div class="col-md-4">
-                <div class="input-group">
-                    <span class="input-group-text"><i class="fas fa-search"></i></span>
-                    <input type="text" class="form-control" id="searchInput" placeholder="Rechercher un sinistre...">
-                </div>
-            </div>
+         <form method="GET" action="{{ route('expert.listeExpertises') }}">
+                <div class="row mb-4 mt-4">
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-search"></i></span>
+                            <input type="text" class="form-control" id="searchInput" name="search" placeholder="Rechercher un sinistre...">
+                        </div>
+                    </div>
+                    <!-- Filtre statut -->
+                    <div class="col-md-3">
+                        <select class="form-select" name="statut" onchange="this.form.submit()">
+                            <option value="">Tous les statuts</option>
+                            <option value="4" {{ request('statut')=='4' ? 'selected' : '' }}>Rejeté</option>
+                            <option value="5" {{ request('statut')=='5' ? 'selected' : '' }}>Validé</option>
+                        </select>
+                    </div>
 
-            <div class="col-md-3">
-                <select class="form-select" id="statusFilter">
-                    <option value="">Tous les statuts</option>
-                    <option value="rejeter">Rejeté</option>
-                    <option value="valider">validé</option>
-                </select>
-            </div>
-        </div>
+                   
+
+                    <!-- Filtre par période -->
+                    <div class="col-md-2">
+                        <input type="date" name="date_declaration" class="form-control" value="{{ request('date_declaration') }}"  onchange="this.form.submit()">
+                    </div>
+
+                </div>
+            </form>
 
        <!-- ====== Tableau des expertises ====== -->
         <div class="card">
