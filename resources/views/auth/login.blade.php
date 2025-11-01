@@ -167,9 +167,25 @@
 
         <form method="POST" action="{{ route('auth.connection') }}">
             @csrf
-            <input type="text" name="identifier" class="form-control" placeholder="Adresse email" required autofocus>
+            <input type="text" name="identifier" class="form-control" placeholder="Adresse email ou téléphone" required autofocus
+                value="{{ old('identifier') }}">
             <input type="password" name="password" class="form-control" placeholder="Mot de passe" required>
             <button type="submit" class="btn btn-login">Se connecter</button>
+
+            <!-- Affichage des erreurs -->
+            @if($errors->any())
+                <div class="alert alert-danger mt-3">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    {{ $errors->first() }}
+                </div>
+            @endif
+
+            @if(session('status'))
+                <div class="alert alert-success mt-3">
+                    <i class="fas fa-check-circle me-2"></i>
+                    {{ session('status') }}
+                </div>
+            @endif
         </form>
 
         <div class="text-links">
@@ -179,3 +195,7 @@
 </div>
 
 @endsection
+
+
+
+

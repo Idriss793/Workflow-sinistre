@@ -13,6 +13,7 @@ class Expertise extends Model
         'expertise_path',
         'statut_id',
         'expert_id',
+        'motif_refus'
     ];
 
     public function sinistre(){

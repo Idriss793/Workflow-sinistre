@@ -40,7 +40,7 @@
     <ul class="nav nav-tabs" id="sinistreTabs" role="tablist">
         <li class="nav-item">
             <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab">
-                Infos Sinistre
+                Infos Sinistre & Expertises
             </button>
         </li>
         <li class="nav-item">
@@ -58,7 +58,7 @@
                 Documents
             </button>
         </li>
-        
+       
     </ul>
 
     <!-- Contenu des onglets -->
@@ -76,6 +76,9 @@
         <!-- Documents -->
         @include('responsable.partials.documents')
 
+     
+
+
 
     </div>
 </div>
@@ -91,22 +94,101 @@ document.addEventListener('DOMContentLoaded', function () {
     const tabKey = 'activeSinistreTab';
     const storedTab = localStorage.getItem(tabKey);
 
-    // Si un onglet a été enregistré, on le restaure
-    // if (storedTab) {
-    //     const someTabTriggerEl = document.querySelector(`#sinistreTabs button[data-bs-target="${storedTab}"]`);
-    //     if (someTabTriggerEl) {
-    //         const tab = new bootstrap.Tab(someTabTriggerEl);
-    //         tab.show();
-    //     }
-    // }
+    
+});
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
 
-    // Lorsqu’un onglet est cliqué, on le sauvegarde
-    // document.querySelectorAll('#sinistreTabs button[data-bs-toggle="tab"]').forEach(tabEl => {
-    //     tabEl.addEventListener('shown.bs.tab', event => {
-    //         const target = event.target.getAttribute('data-bs-target');
-    //         localStorage.setItem(tabKey, target);
-    //     });
-    // });
+    // Validation d'une expertise
+    document.querySelectorAll('.btn-valider').forEach(button => {
+        button.addEventListener('click', function () {
+            const id = this.dataset.id;
+
+            Swal.fire({
+                title: 'Confirmer la validation',
+                text: "Voulez-vous vraiment valider cette expertise ?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Oui, valider',
+                cancelButtonText: 'Annuler',
+                confirmButtonColor: '#198754',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/expertises/${id}/valider`, {
+                        method: 'PUT',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        }
+                    }).then(response => {
+                        if (response.ok) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Expertise validée',
+                                text: 'Cette expertise a été validée avec succès.',
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                            button.disabled = true;
+                            button.nextElementSibling.disabled = true;
+                            setTimeout(() => location.reload(), 2000);
+                        }
+                    });
+                }
+            });
+        });
+    });
+
+    // Refus d'une expertise
+    document.querySelectorAll('.btn-refuser').forEach(button => {
+        button.addEventListener('click', function () {
+            const id = this.dataset.id;
+
+            Swal.fire({
+                title: 'Refuser cette expertise',
+                input: 'textarea',
+                inputLabel: 'Veuillez indiquer le motif du refus :',
+                inputPlaceholder: 'Écrire ici...',
+                inputAttributes: { 'aria-label': 'Motif du refus' },
+                showCancelButton: true,
+                confirmButtonText: 'Confirmer le refus',
+                cancelButtonText: 'Annuler',
+                confirmButtonColor: '#d33',
+                preConfirm: (motif) => {
+                    if (!motif) {
+                        Swal.showValidationMessage('Le motif du refus est obligatoire');
+                        return false;
+                    }
+                    return motif;
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/expertises/${id}/refuser`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({ motif: result.value })
+                    }).then(response => {
+                        if (response.ok) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Expertise refusée',
+                                text: 'Le refus a été enregistré avec succès.',
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                            button.disabled = true;
+                            button.previousElementSibling.disabled = true;
+                            setTimeout(() => location.reload(), 2000);
+                        }
+                    });
+                }
+            });
+        });
+    });
 });
 </script>
 @endpush

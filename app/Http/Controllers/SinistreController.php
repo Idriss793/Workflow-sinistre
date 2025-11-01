@@ -246,7 +246,7 @@ class SinistreController  extends Controller
             'users',
             'expertise.expert',
             'expertise.statut',
-             'passagers',
+            'passagers',
         ])->findOrFail($id);
 
         // Liste des types de documents obligatoires
@@ -367,4 +367,9 @@ class SinistreController  extends Controller
         // Retour avec message de succès
         return back()->with('success', 'Profil mis à jour avec succès.');
     }
+
+
+
+    
+
 }

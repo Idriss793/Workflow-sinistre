@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use Carbon\Carbon;
 use App\Models\Passage;
+use App\Models\Statuts;
 use App\Models\Sinistre;
+use App\Models\Expertise;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
@@ -89,17 +92,23 @@ class ResponsableController extends Controller
             'assureTiers',
             'assurePrincipals',
             'statut',
-            'documents'
+            'documents',
+            'users',
+            'expertise.expert',
+            'expertise.statut',
         ])->findOrFail($id);
 
         // Pagination sur la relation many-to-many
         $passages = $sinistres->passagers()->paginate(10);
 
+        $expertises = $sinistres->expertise()->with(['expert', 'statut'])->paginate(5);
+
+
         $title = "Responsable";
         $url = 'indexResponsable';
         $user = Auth::user();
 
-        return view('responsable.show', compact('sinistres', 'user','title', 'url', 'passages'));
+        return view('responsable.show', compact('sinistres', 'user','title', 'url', 'passages', 'expertises'));
     }
 
 
@@ -262,5 +271,63 @@ class ResponsableController extends Controller
         // Retour avec message de succès
         return back()->with('success', 'Profil mis à jour avec succès.');
     }
+
+
+    // fonction pour valider un sinistre
+    public function validerSinistre($id){
+        $sinistre = Sinistre::findOrFail($id);
+        $statutValide = Statuts::where('ordre_statut', 5)->first();
+        $sinistre->statut_id = $statutValide->id;
+        //$expertise = $sinistre->expertise()->where('statut_id', '!=', 7)->first();
+        $sinistre->save();
+        return redirect()->back()->with('status','Sinistre validé avec succès');
+    }
+
+    // fonction pour rejeter un sinistre
+    public function rejeterSinistre($id){
+        $sinistre = Sinistre::findOrFail($id);
+        $statutRejete = Statuts::where('ordre_statut', 4)->first();
+        $sinistre->statut_id = $statutRejete->id;
+        $sinistre->save();
+        return redirect()->back()->with('status','Sinistre rejeté avec succès');
+    }
+
+    public function validerExpertise($id)
+    {
+        $expertise = Expertise::with('sinistre')->findOrFail($id);
+        $sinistre = $expertise->sinistre;
+
+        DB::transaction(function () use ($expertise, $sinistre) {
+            // Valider cette expertise
+            $expertise->update([
+                'statut_id' => Statuts::where('ordre_statut', 5)->first()->id
+            ]);
+
+            // Refuser toutes les autres expertises du même sinistre
+            Expertise::where('sinistre_id', $sinistre->id)
+                ->where('id', '!=', $expertise->id)
+                ->update([
+                    'statut_id' => Statuts::where('ordre_statut', 4)->first()->id
+                ]);
+
+            // Mettre à jour le statut du sinistre
+            $sinistre->update([
+                'statut_id' => Statuts::where('ordre_statut', 5)->first()->id
+            ]);
+        });
+
+        return response()->json(['success' => true]);
+    }
+
+    public function refuserExpertise(Request $request, $id)
+    {
+        $expertise = Expertise::findOrFail($id);
+        $expertise->update([
+            'statut_id' => 4, // exemple : 4 = Refusé
+            'motif_refus' => $request->motif
+        ]);
+        return response()->json(['success' => true]);
+    }
+
 
 }

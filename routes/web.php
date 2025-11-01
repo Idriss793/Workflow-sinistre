@@ -84,7 +84,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/passages/{id}', [PassageController::class, 'show'])->name('passages.show');
         Route::get('/profileResponsable', [ResponsableController::class, 'profile'])->name('responsable.profile');
         Route::put('/profileResponsable', [ResponsableController::class, 'updateProfile'])->name('profileResponsable.update');
-
+        Route::get('/sinistre/valider/{id}', [ResponsableController::class, 'validerSinistre'])->name('sinistres.valider');
+        Route::get('/sinistre/rejeter/{id}', [ResponsableController::class, 'rejeterSinistre'])->name('sinistres.rejeter');
+        Route::put('/expertises/{id}/valider', [ResponsableController::class, 'validerExpertise'])->name('expertises.valider');
+        Route::put('/expertises/{id}/refuser', [ResponsableController::class, 'refuserExpertise'])->name('expertises.refuser');
 
 
     });
