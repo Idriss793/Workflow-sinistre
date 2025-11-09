@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
+use App\Models\User;
 use App\Models\Passage;
 use App\Models\Statuts;
 use App\Models\Sinistre;
@@ -10,6 +11,7 @@ use App\Models\Expertise;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Notifications\UserNotification;
 
 class ExpertController extends Controller
 {
@@ -86,8 +88,10 @@ class ExpertController extends Controller
         $title = "Expert";
         $url='indexExpert';
         $user = Auth::user();
+        $notifications = auth()->user()->notifications;
+
         return view('expert.indexExpert',compact('title','sinistres','url','user',
-        'a_traiter', 'traites', 'valide', 'rejete'));
+        'a_traiter', 'traites', 'valide', 'rejete','notifications'));
     }
 
     public function show(string $id){
@@ -125,10 +129,22 @@ class ExpertController extends Controller
             'expertise_path' => $path,
             'sinistre_id' => $request->sinistre_id,
             'statut_id'=> $statut-> id,
+            'expert_id'=> auth()->user()->id,
         ]);
          // Mise à jour du statut du sinistre (id = 6)
         $sinistre->update(['statut_id' => 6]);
-
+        $gest_id = $sinistre->user_id;
+        $gestionnaires =  User::findorFail($gest_id);
+        $gestionnaires->notify(new UserNotification('gestionnaire',[
+            'num_sin'=>$sinistre->numero_sinistre,
+            'status'=>$statut->lib_statut
+        ]));
+        $responsable = User::findorFail(2);
+        $responsable->notify(new UserNotification('responsable',[
+            'num_sin'=>$sinistre->numero_sinistre,
+            'status'=>$statut->lib_statut
+        ]));
+        // Supposons que l'ID 1 est celui du responsable
         return back()->with('status','Expertise envoyée avec succès');
     }
 
@@ -162,8 +178,8 @@ class ExpertController extends Controller
         $title = "Mes expertises";
         $url='listeExpertises';
         $user = Auth::user();
-
-        return view('expert.listeExpertises',compact('title','expertises','url','user'));
+        $notifications = auth()->user()->notifications;
+        return view('expert.listeExpertises',compact('title','expertises','url','user','notifications'));
     }
 
     //Affichage du profil de l'expert
@@ -171,7 +187,8 @@ class ExpertController extends Controller
         $title = "Mon profil";
         $url='profileExpert';
         $user = Auth::user();
-        return view('expert.profile',compact('title','url','user'));
+        $notifications = auth()->user()->notifications;
+        return view('expert.profile',compact('title','url','user','notifications'));
     }
 
     public function search(Request $request){
@@ -271,10 +288,11 @@ class ExpertController extends Controller
         $title = "Expert";
         $url = 'listeExpertises';
         $user = Auth::user();
-
+        $notifications = auth()->user()->notifications;
         return view('expert.indexExpert', compact(
             'sinistres', 'title', 'url', 'user',
-            'a_traiter', 'traites', 'valide', 'rejete'
+            'a_traiter', 'traites', 'valide', 'rejete',
+            'notifications'
         ));
     }
 
@@ -316,4 +334,6 @@ class ExpertController extends Controller
         // Retour avec message de succès
         return back()->with('success', 'Profil mis à jour avec succès.');
     }
+
+ 
 }

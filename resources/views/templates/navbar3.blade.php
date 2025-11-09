@@ -345,42 +345,33 @@
                 <div class="dropdown">
                     <button class="notification-btn" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="fas fa-bell"></i>
-                        <span class="notification-badge" id="notificationCount">3</span>
+                        <span class="notification-badge" id="notificationCount">{{auth()->user()->unreadNotifications()->count()}}</span>
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end" style="width: 320px;">
+                   <ul class="dropdown-menu dropdown-menu-end" style="width: 320px;">
                         <li class="dropdown-header d-flex justify-content-between align-items-center">
                             <span><i class="fas fa-bell me-2"></i>Notifications</span>
-                            <small class="text-muted">3 nouvelles</small>
+                            <small class="text-muted">{{auth()->user()->unreadNotifications()->count()}} nouvelle(s)s</small>
                         </li>
                         <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <a class="dropdown-item" href="#">
-                                <div class="d-flex">
-                                    <div class="flex-shrink-0">
-                                        <i class="fas fa-exclamation-triangle text-warning"></i>
+                        @foreach (auth()->user()->unreadNotifications as $notification)
+                            <li>
+                                <a class="dropdown-item" href="#">
+                                    <div class="d-flex">
+                                        <div class="flex-shrink-0">
+                                            <i class="fas fa-exclamation-triangle text-warning"></i>
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                          
+                                            <h6 class="dropdown-header mb-1">Une action est attendue</h6>
+                                            <p class="mb-0 text-muted small">Sinistre #{{$notification->data['data']['num_sin']??'-'}}</p>
+                                            <small class="text-muted">{{$notification->created_at->diffForHumans()}}</small>
+                                           
+                                        </div>
                                     </div>
-                                    <div class="flex-grow-1 ms-3">
-                                        <h6 class="dropdown-header mb-1">Nouveau sinistre assigné</h6>
-                                        <p class="mb-0 text-muted small">Sinistre #SIN-2024-001234</p>
-                                        <small class="text-muted">Il y a 5 minutes</small>
-                                    </div>
-                                </div>
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="#">
-                                <div class="d-flex">
-                                    <div class="flex-shrink-0">
-                                        <i class="fas fa-clock text-info"></i>
-                                    </div>
-                                    <div class="flex-grow-1 ms-3">
-                                        <h6 class="dropdown-header mb-1">Rappel d'expertise</h6>
-                                        <p class="mb-0 text-muted small">2 dossiers en attente</p>
-                                        <small class="text-muted">Il y a 1 heure</small>
-                                    </div>
-                                </div>
-                            </a>
-                        </li>
+                                </a>
+                            </li>
+                        @endforeach
+                           
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item text-center" href="#"><i class="fas fa-eye me-2"></i>Voir toutes les notifications</a></li>
                     </ul>

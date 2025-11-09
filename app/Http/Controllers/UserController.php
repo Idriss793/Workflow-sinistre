@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -92,6 +93,68 @@ class UserController extends Controller
         }
 
         return back()->withErrors(['identifier' => 'Email ou mot de passe incorrect.'])->withInput();
+    }
+
+
+     public function store(Request $request)
+    {
+        //Validation des données
+        $validated = $request->validate([
+            'name'         => 'required|string|max:255',
+            'first_name'   => 'required|string|max:255',
+            'phone_number' => 'required|string|max:20',
+            'email'        => 'required|email|unique:users,email',
+            'password'     => 'required|string|min:6',
+            'role'         => 'required|string', // ou 'exists:roles,nom_role' si tu as une table roles
+        ]);
+
+        // Création de l’utilisateur
+        $user = User::create([
+            'name'         => $validated['name'],
+            'first_name'   => $validated['first_name'],
+            'phone_number' => $validated['phone_number'],
+            'email'        => $validated['email'],
+            'password'     => $validated['password'], // pas de Hash car tu m’as précisé que tu as retiré le cryptage
+            'role_id'      => $this->getRoleId($validated['role']),
+            'is_active'    => 1, // par défaut actif
+        ]);
+
+        // Message de succès
+        return redirect()->back()->with('success', 'Utilisateur ajouté avec succès !');
+    }
+
+    /**
+     * Retourne l'ID du rôle selon son nom.
+     * Tu peux adapter cette fonction selon ta table `roles`.
+     */
+    private function getRoleId($roleName)
+    {
+        return match (strtolower($roleName)) {
+            'gestionnaire' => 1,
+            'expert'       => 2,
+            'comptable'    => 3,
+            default        => null,
+        };
+    }
+
+    
+
+    public function block($id)
+    {
+        $user = \App\Models\User::findOrFail($id);
+        $user->is_active = 0;
+        $user->save();
+
+        return redirect()->back()->with('status', 'Utilisateur bloqué avec succès.');
+    }
+
+    public function unblock($id)
+    {
+        $user = \App\Models\User::findOrFail($id);
+        $user->is_active = 1;
+        $user->save();
+
+        return redirect()->back()->with('status', 'Utilisateur débloqué avec succès.');
     }
 
 

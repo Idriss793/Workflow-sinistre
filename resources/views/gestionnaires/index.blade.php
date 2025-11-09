@@ -154,23 +154,28 @@
 
     <!-- Alert documents manquants  -->
     @if($manquants->isNotEmpty())
-        <div class="alert alert-danger d-flex align-items-start mb-4" style="border-radius: 12px; border: none;">
-            <div class="feature-icon">
-                <i class="fas fa-exclamation-triangle"></i>
-            </div>
-            <div class="flex-grow-1">
-                <h5 class="alert-heading mb-2">Documents manquants requis</h5>
-                <p class="mb-2">Les documents suivants sont nécessaires pour finaliser le traitement :</p>
-                <div class="row">
-                    @foreach($manquants as $doc)
-                        @if(array_key_exists($doc, $nomsDocuments))
-                        <div class="col-md-4 mb-1">
-                            <i class="fas fa-times-circle text-danger me-2"></i>
-                            {{ $nomsDocuments[$doc] }}
-                        </div>
-                        @endif
-                    @endforeach
+        <div class="alert bg-light border-start border-4 border-danger shadow-sm p-4 mb-4 rounded-3">
+            <div class="d-flex align-items-start mb-3">
+                <div class="me-3 text-danger">
+                    <i class="fas fa-exclamation-triangle fa-lg"></i>
                 </div>
+                <div>
+                    <h5 class="fw-semibold mb-1 text-danger">Documents manquants</h5>
+                    <p class="text-muted mb-0">Les documents suivants sont requis pour finaliser le traitement :</p>
+                </div>
+            </div>
+
+            <div class="row g-2">
+                @foreach($manquants as $doc)
+                    @if(array_key_exists($doc, $nomsDocuments))
+                        <div class="col-md-6 col-lg-4">
+                            <div class="d-flex align-items-center bg-white border rounded-3 p-2 small shadow-sm">
+                                <i class="fas fa-file-alt text-secondary me-2"></i>
+                                <span>{{ $nomsDocuments[$doc] }}</span>
+                            </div>
+                        </div>
+                    @endif
+                @endforeach
             </div>
         </div>
     @endif

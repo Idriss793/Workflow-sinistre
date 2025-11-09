@@ -18,7 +18,8 @@
                     <!-- Filtre statut -->
                     <div class="col-md-3">
                         <select class="form-select" name="statut" onchange="this.form.submit()">
-                            <option value="">Tous les statuts</option>
+                            <option value="">Tous les statuts</option>µ
+                            <option value="6" {{ request('statut')=='6' ? 'selected' : '' }}>En attente de validation</option>
                             <option value="4" {{ request('statut')=='4' ? 'selected' : '' }}>Rejeté</option>
                             <option value="5" {{ request('statut')=='5' ? 'selected' : '' }}>Validé</option>
                         </select>

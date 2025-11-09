@@ -66,7 +66,7 @@
                                         </div>
                                     </td>
                                 </tr>
-                                
+    
                                 <tr>
                                    
                                     <td class="fw-semibold">Mba</td>

@@ -114,11 +114,15 @@ class ResponsableController extends Controller
 
 
     public function showPersonnel(){
+        // Récupération de tous les utilisateurs
+        $utilisateurs = \App\Models\User::orderBy('name')->paginate(10);
+
         $title = "Responsable";
         $url='indexResponsable';
         $user = Auth::user();
-        return view('responsable.personnel',compact('title','url','user'));
+        return view('responsable.personnel', compact('utilisateurs', 'title', 'url', 'user'));
     }
+    
 
     //Affichage du profil du gestionnaire
     public function profile(){

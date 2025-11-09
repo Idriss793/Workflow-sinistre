@@ -345,44 +345,42 @@
                 <div class="dropdown">
                     <button class="notification-btn" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="fas fa-bell"></i>
-                        <span class="notification-badge" id="notificationCount">3</span>
+                        @if (auth()->user()->unreadNotifications()->count() > 0)
+                            <span class="notification-badge" id="notificationCount">
+                                {{auth()->user()->unreadNotifications()->count()}}
+                            </span>
+                        @endif
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end" style="width: 320px;">
                         <li class="dropdown-header d-flex justify-content-between align-items-center">
                             <span><i class="fas fa-bell me-2"></i>Notifications</span>
-                            <small class="text-muted">3 nouvelles</small>
+                            <small class="text-muted">{{auth()->user()->unreadNotifications()->count()}} nouvelle(s)</small>
                         </li>
                         <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <a class="dropdown-item" href="#">
-                                <div class="d-flex">
-                                    <div class="flex-shrink-0">
-                                        <i class="fas fa-exclamation-triangle text-warning"></i>
+                        @forelse (auth()->user()->unreadNotifications as $notification)
+                            
+                            <li>
+                                <a class="dropdown-item" href="{{ route('notification.read', $notification->id) }}">
+                                    <div class="d-flex">
+                                        <div class="flex-shrink-0">
+                                            <i class="fas fa-exclamation-triangle text-warning"></i>
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <h6 class="dropdown-header mb-1">Nouveau sinistre assigné</h6>
+                                            <p class="mb-0 text-muted small">Sinistre #{{$notification->data['data']['num_sin']??'-'}}</p>
+                                            <small class="text-muted">{{$notification->created_at->diffForHumans()}}</small>
+                                        </div>
                                     </div>
-                                    <div class="flex-grow-1 ms-3">
-                                        <h6 class="dropdown-header mb-1">Nouveau sinistre assigné</h6>
-                                        <p class="mb-0 text-muted small">Sinistre #SIN-2024-001234</p>
-                                        <small class="text-muted">Il y a 5 minutes</small>
-                                    </div>
-                                </div>
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="#">
-                                <div class="d-flex">
-                                    <div class="flex-shrink-0">
-                                        <i class="fas fa-clock text-info"></i>
-                                    </div>
-                                    <div class="flex-grow-1 ms-3">
-                                        <h6 class="dropdown-header mb-1">Rappel d'expertise</h6>
-                                        <p class="mb-0 text-muted small">2 dossiers en attente</p>
-                                        <small class="text-muted">Il y a 1 heure</small>
-                                    </div>
-                                </div>
-                            </a>
-                        </li>
+                                </a>
+                            </li>
+                        @empty
+                            <li class="dropdown-item text-center text-muted">
+                                Aucune notification.
+                            </li>
+                        @endforelse
+                        
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item text-center" href="#"><i class="fas fa-eye me-2"></i>Voir toutes les notifications</a></li>
+                        <li><a class="dropdown-item text-center" href="{{ route('notifications.showAll') }}"><i class="fas fa-eye me-2"></i>Voir toutes les notifications</a></li>
                     </ul>
                 </div>
 
@@ -445,6 +443,11 @@
                         <i class="fas fa-file-alt me-2"></i>Rapport expertises
                     </a>
                 </li>
+                <!-- <li class="nav-item">
+                    <a class="nav-link {{ Request::is('notifications') ? 'active' : '' }}" href="{{url('notifications')}}">
+                        <i class="fas fa-bell me-2"></i>Notifications
+                    </a>
+                </li> -->
                 
             </ul>
         </div>

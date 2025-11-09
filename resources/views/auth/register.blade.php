@@ -23,7 +23,7 @@
 
                 <!-- Corps de la carte -->
                 <div class="card-body p-5">
-                    <form method="POST" action="#">
+                    <form method="POST" action="{{ route('users.store') }}">
                         @csrf
 
                         <!-- Informations personnelles -->
@@ -77,9 +77,9 @@
                                         <i class="fas fa-phone me-1"></i>Numéro de téléphone <span class="text-danger">*</span>
                                     </label>
                                     <div class="input-group">
-                                        <span class="input-group-text bg-light">+33</span>
+                                        <span class="input-group-text bg-light">+241</span>
                                         <input type="tel" class="form-control" id="phone_number" name="phone_number" 
-                                               placeholder="1 23 45 67 89" required>
+                                               placeholder="066 77 09 10" required>
                                     </div>
                                     @error('phone_number')
                                         <div class="text-danger small mt-1">{{ $message }}</div>

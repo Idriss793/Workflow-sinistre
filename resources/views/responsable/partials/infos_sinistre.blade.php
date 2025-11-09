@@ -73,6 +73,7 @@
                                 <th>Expert</th>
                                 <th>Date de réception</th>
                                 <th>Montant</th>
+                                <th>Rapport</th>
                                 <th>Statut</th>
                                 <th>Action</th>
                             </tr>
@@ -83,6 +84,15 @@
                                     <td>{{ $expertise->expert->name ?? 'N/A' }}</td>
                                     <td>{{ $expertise->created_at->format('d/m/Y H:i') }}</td>
                                     <td class="text-center">{{ $expertise->estimation_degats ?? '-' }}</td>
+                                    <td>
+                                        @if ($expertise->expertise_path)
+                                            <a href="{{ asset('storage/' . $expertise->expertise_path) }}" target="_blank" class="text-decoration-none">
+                                                <i class="fas fa-file-pdf text-danger"></i> Voir
+                                            </a>
+                                        @else
+                                            <span class="badge bg-secondary">Aucun fichier</span>
+                                        @endif
+                                    </td>
                                     <td>
                                         <span class="badge
                                             @if($expertise->statut->ordre_statut == 5) bg-success

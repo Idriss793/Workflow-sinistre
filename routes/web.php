@@ -14,6 +14,7 @@ use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\SinistreController;
 use App\Http\Controllers\assureTiersController;
 use App\Http\Controllers\ResponsableController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\assurePrincipalController;
 
 Route::get('/', function () {
@@ -72,6 +73,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/storeExpertise', [ExpertController::class, 'storeExpertise'])->name('expert.storeExpertise');
         Route::get('/passageExpert/{id}', [PassageController::class, 'show'])->name('passages.show');
         Route::put('/profileExpert', [ExpertController::class, 'updateProfile'])->name('profileExpert.update');
+        Route::get('/notification/mark-as-read/{id}', [NotificationController::class, 'markAsRead'])->name('notification.read');
+        Route::get('/notifications', [NotificationController::class, 'showAll'])->name('notifications.showAll');
     });
 
     // Interface responsable
@@ -88,6 +91,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/sinistre/rejeter/{id}', [ResponsableController::class, 'rejeterSinistre'])->name('sinistres.rejeter');
         Route::put('/expertises/{id}/valider', [ResponsableController::class, 'validerExpertise'])->name('expertises.valider');
         Route::put('/expertises/{id}/refuser', [ResponsableController::class, 'refuserExpertise'])->name('expertises.refuser');
+        Route::post('/users', [UserController::class, 'store'])->name('users.store');
+        Route::patch('/users/{id}/block', [UserController::class, 'block'])->name('users.block');
+        Route::patch('/users/{id}/unblock', [UserController::class, 'unblock'])->name('users.unblock');
 
 
     });
@@ -97,4 +103,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/indexAdmin', [StatutController::class, 'index'])->name('admin.formStatut');
         Route::post('/storeStatut', [StatutController::class, 'store'])->name('admin.store');
     });
+
+    
 });

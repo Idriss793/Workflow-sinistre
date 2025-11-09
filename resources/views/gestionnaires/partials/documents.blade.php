@@ -104,7 +104,7 @@
                             <label class="form-label">Type de document</label>
                             <select class="form-select" name="type_doc" required>
                                 <option value="" disabled selected>Sélectionner un type...</option>
-                                <option value="constat">Constat amiable</option>
+                                <option value="constat">Constat amiable ou de police</option>
                                 <option value="photos">Photos</option>
                                 <option value="permis">Relevé permis</option>
                                 <option value="carte_grise">Carte grise</option>

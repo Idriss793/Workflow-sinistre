@@ -15,6 +15,7 @@ use App\Models\AssurePrincipal;
 use App\Models\AssureTiersSinistre;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Notifications\UserNotification;
 
 class SinistreController  extends Controller
 {
@@ -38,6 +39,7 @@ class SinistreController  extends Controller
     // avec la liste des sinistre a traite et les défférents filtre
     
     public function home(Request $request){
+        
         $query = Sinistre::with(['assurePrincipals','statut','experts'])
             ->where('user_id',auth()->user()->id)
              ->orderBy('created_at', 'desc')
@@ -79,64 +81,64 @@ class SinistreController  extends Controller
         ->withCount([
             'sinistresExpert as sinistres_en_cours_de_traitement' => function ($q) {
                 $q->whereHas('statut', function ($sub) {
-                    $sub->whereIn('ordre_statut', ['3', '6']);
+                    $sub->where('ordre_statut', 3);
                 });
             }
         ])
         ->get();
-    // ======================
-    //  Calcul période
-    // ======================
-    $maintenant = Carbon::now();
+        // ======================
+        //  Calcul période
+        // ======================
+        $maintenant = Carbon::now();
 
-    if ($request->filled('mois')) {
-        // Cas : mois spécifique
-        $debut = Carbon::create($maintenant->year, $request->mois, 1);
-        $fin = $debut->copy()->endOfMonth();
-    } else {
-        switch ($request->periode) {
-            case '1_semaine':
-                $debut = $maintenant->copy()->subWeek();
-                break;
-            case '3_mois':
-                $debut = $maintenant->copy()->subMonths(3);
-                break;
-            case '1_an':
-                $debut = $maintenant->copy()->subYear();
-                break;
-            case '1_mois':
-            default:
-                $debut = $maintenant->copy()->subMonth();
-                break;
+        if ($request->filled('mois')) {
+            // Cas : mois spécifique
+            $debut = Carbon::create($maintenant->year, $request->mois, 1);
+            $fin = $debut->copy()->endOfMonth();
+        } else {
+            switch ($request->periode) {
+                case '1_semaine':
+                    $debut = $maintenant->copy()->subWeek();
+                    break;
+                case '3_mois':
+                    $debut = $maintenant->copy()->subMonths(3);
+                    break;
+                case '1_an':
+                    $debut = $maintenant->copy()->subYear();
+                    break;
+                case '1_mois':
+                default:
+                    $debut = $maintenant->copy()->subMonth();
+                    break;
+            }
+            $fin = $maintenant;
         }
-        $fin = $maintenant;
-    }
 
-    // ======================
-    //  Données Dashboard
-    // ======================
-    $sinistres_declares = Sinistre::where('user_id', auth()->user()->id)
-        ->whereBetween('created_at', [$debut, $fin])
-        ->count();
+        // ======================
+        //  Données Dashboard
+        // ======================
+        $sinistres_declares = Sinistre::where('user_id', auth()->user()->id)
+            ->whereBetween('created_at', [$debut, $fin])
+            ->count();
 
-    $sinistres_clotures = Sinistre::where('user_id', auth()->user()->id)
-        ->whereBetween('updated_at', [$debut, $fin])
-        ->whereHas('statut', function ($q) {
-            $q->where('lib_statut', 'clôturé')
-              ->orWhere('ordre_statut', '7');
-        })
-        ->count();
+        $sinistres_clotures = Sinistre::where('user_id', auth()->user()->id)
+            ->whereBetween('updated_at', [$debut, $fin])
+            ->whereHas('statut', function ($q) {
+                $q->where('lib_statut', 'clôturé')
+                ->orWhere('ordre_statut', '7');
+            })
+            ->count();
 
-    $en_attente = Sinistre::where('user_id', auth()->user()->id)
-        ->whereHas('statut', function ($q) {
-            $q->where('lib_statut', 'en attente')
-              ->orWhere('ordre_statut', '6');
-        })
-        ->count();
+        $en_attente = Sinistre::where('user_id', auth()->user()->id)
+            ->whereHas('statut', function ($q) {
+                $q->where('lib_statut', 'en attente')
+                ->orWhere('ordre_statut', '6');
+            })
+            ->count();
 
-    $taux_cloture = $sinistres_declares > 0
-        ? round(($sinistres_clotures / $sinistres_declares) * 100)
-        : 0;
+        $taux_cloture = $sinistres_declares > 0
+            ? round(($sinistres_clotures / $sinistres_declares) * 100)
+            : 0;
 
         //titre
         $title="Gestionnaire";
@@ -222,7 +224,60 @@ class SinistreController  extends Controller
             }
         ])
         ->get();
+        
+         // ======================
+        //  Calcul période
+        // ======================
+        $maintenant = Carbon::now();
 
+        if ($request->filled('mois')) {
+            // Cas : mois spécifique
+            $debut = Carbon::create($maintenant->year, $request->mois, 1);
+            $fin = $debut->copy()->endOfMonth();
+        } else {
+            switch ($request->periode) {
+                case '1_semaine':
+                    $debut = $maintenant->copy()->subWeek();
+                    break;
+                case '3_mois':
+                    $debut = $maintenant->copy()->subMonths(3);
+                    break;
+                case '1_an':
+                    $debut = $maintenant->copy()->subYear();
+                    break;
+                case '1_mois':
+                default:
+                    $debut = $maintenant->copy()->subMonth();
+                    break;
+            }
+            $fin = $maintenant;
+        }
+
+            // ======================
+            //  Données Dashboard
+            // ======================
+            $sinistres_declares = Sinistre::where('user_id', auth()->user()->id)
+                ->whereBetween('created_at', [$debut, $fin])
+                ->count();
+
+            $sinistres_clotures = Sinistre::where('user_id', auth()->user()->id)
+                ->whereBetween('updated_at', [$debut, $fin])
+                ->whereHas('statut', function ($q) {
+                    $q->where('lib_statut', 'clôturé')
+                    ->orWhere('ordre_statut', '7');
+                })
+                ->count();
+
+            $en_attente = Sinistre::where('user_id', auth()->user()->id)
+                ->whereHas('statut', function ($q) {
+                    $q->where('lib_statut', 'en attente')
+                    ->orWhere('ordre_statut', '6');
+                })
+                ->count();
+
+            $taux_cloture = $sinistres_declares > 0
+                ? round(($sinistres_clotures / $sinistres_declares) * 100)
+                : 0;
 
 
             
@@ -233,7 +288,8 @@ class SinistreController  extends Controller
         $title = "Gestionnaire";
         $url='home';
         $user = Auth::user();
-        return view('gestionnaires.listeSinistre',compact('sinistres','experts','title','url','user'))->with('status','Sinistre déclarer avec succès');
+        return view('gestionnaires.listeSinistre',compact('sinistres','experts','title','url','user','sinistres_declares',
+        'sinistres_clotures', 'taux_cloture', 'en_attente'))->with('status','Sinistre déclarer avec succès');
     }
 
     public function show(string $id)
@@ -250,13 +306,14 @@ class SinistreController  extends Controller
         ])->findOrFail($id);
 
         // Liste des types de documents obligatoires
-        $obligatoires = ['contrat', 'carte_grise', 'permis'];
+        $obligatoires = ['contrat', 'carte_grise', 'permis', 'constat'];
 
         // Pour afficher des noms lisibles par l'utilisateur
         $nomsDocuments = [
             'carte_grise' => 'Carte grise',
             'contrat'     => "Contrat de l'assuré",
             'permis'      => 'Permis de conduire',
+            'constat'      => 'Constat amiable ou Constat de police',
         ];
 
         // Types de documents déjà fournis
@@ -268,10 +325,8 @@ class SinistreController  extends Controller
         // Documents manquants
         $manquants = collect($obligatoires)->filter(fn($doc) => !$fournis->contains($doc));
 
-       if (in_array(strtolower($sinistres->statut->lib_statut), ["en attente d'expert", "en attente d'expertise"])) {
-            $sinistres->statut_id = $manquants->isEmpty() ? 2 : 1;
-            $sinistres->save();
-        }
+        
+
         $title = "Gestionnaire";
         $url='home';
         $user = Auth::user();
@@ -296,9 +351,9 @@ class SinistreController  extends Controller
         $sinistre = Sinistre::with(['statut'])->findOrFail($id);
 
         // Vérifie le statut du sinistre avant attribution
-        $libelle = strtolower($sinistre->statut->lib_statut);
+        $ordre_status = $sinistre->statut->ordre_statut;
 
-        if ($libelle === "en attente d'expert" || $libelle === "en attente d'expertise") {
+        if (in_array($ordre_status,[2,3,4,5,6,7,8])) {
 
             // Met à jour le statut du sinistre
             $nouveauStatut = Statuts::find(3); // Par exemple : "Expert assigné"
@@ -307,9 +362,13 @@ class SinistreController  extends Controller
 
             // Attribue l'expert sans détacher les précédents
             $sinistre->experts()->syncWithoutDetaching([$request->expert_id]);
-
+            $expert = User::find($request->expert_id);
+            $expert->notify(new UserNotification('expert', [
+                'num_sin' => $sinistre->numero_sinistre,
+            ]));
             return redirect()->back()->with('status', 'Sinistre attribué avec succès');
         }
+        
 
         return redirect()->back()->with('error', "Impossible d'attribuer un expert à ce sinistre car il y a des documents manquants");
     }
@@ -367,9 +426,5 @@ class SinistreController  extends Controller
         // Retour avec message de succès
         return back()->with('success', 'Profil mis à jour avec succès.');
     }
-
-
-
-    
 
 }

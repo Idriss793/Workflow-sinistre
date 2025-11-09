@@ -211,11 +211,7 @@
                                                 <i class="fas fa-eye"></i> Consulter
                                             </a>
 
-                                            <button class="btn btn-sm btn-success"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#rapportModal{{ $sinistre->id }}">
-                                                <i class="fas fa-file-earmark-plus"></i> Envoyer rapport
-                                            </button>
+                                           
                                         </td>
                                     </tr>
 

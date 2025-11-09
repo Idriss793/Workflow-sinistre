@@ -232,21 +232,7 @@
                                             <i class="bi bi-eye"></i>
                                         </a>
 
-                                        <!-- Bouton Valider -->
-                                        <a class="btn btn-sm btn-success {{ $sinistre->statut->ordre_statut == 6 ? '' : 'disabled' }}"
-                                            href="{{ $sinistre->statut->ordre_statut == 6 ? route('sinistres.valider', $sinistre->id) : '#' }}"
-                                            data-bs-toggle="tooltip"
-                                            title="Valider">
-                                            <i class="bi bi-check-circle"></i>
-                                        </a>
-
-                                        <!-- Bouton Rejeter -->
-                                        <a class="btn btn-sm btn-danger {{ $sinistre->statut->ordre_statut == 6 ? '' : 'disabled' }}"
-                                            href="{{ $sinistre->statut->ordre_statut == 6 ? route('sinistres.rejeter', $sinistre->id) : '#' }}"
-                                            data-bs-toggle="tooltip"
-                                            title="Rejeter">
-                                            <i class="bi bi-x-circle"></i>
-                                        </a>
+                                       
 
                                     </td>
                                 </tr>
