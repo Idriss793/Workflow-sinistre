@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
+use App\Models\User;
 use App\Models\Passage;
 use App\Models\Statuts;
 use App\Models\Sinistre;
@@ -11,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Notifications\UserNotification;
 
 class ResponsableController extends Controller
 {
@@ -80,10 +82,10 @@ class ResponsableController extends Controller
 
 
         return view('responsable.index',compact('sinistres','title','url','user',
-    'sinistres_declares',
-    'sinistres_clotures',
-    'taux_cloture',
-    'en_attente'));
+        'sinistres_declares',
+        'sinistres_clotures',
+        'taux_cloture',
+        'en_attente'));
     }
 
   public function show(string $id)
@@ -115,7 +117,7 @@ class ResponsableController extends Controller
 
     public function showPersonnel(){
         // Récupération de tous les utilisateurs
-        $utilisateurs = \App\Models\User::orderBy('name')->paginate(10);
+        $utilisateurs = User::orderBy('name')->paginate(10);
 
         $title = "Responsable";
         $url='indexResponsable';
@@ -319,6 +321,18 @@ class ResponsableController extends Controller
                 'statut_id' => Statuts::where('ordre_statut', 5)->first()->id
             ]);
         });
+        $sinistre = Sinistre::findOrFail($expertise->sinistre_id);
+        $gestionnaire = User::findOrFail($sinistre->user_id);
+        $statut = Statuts::find(5);
+        $gestionnaire->notify(new UserNotification('gestionnaire',[
+            'num_sin'=>$sinistre->numero_sinistre,
+            'status'=>$statut->lib_statut
+        ]));
+        $expert = User::findorFail($expertise->expert_id);
+        $expert->notify(new UserNotification('responsable',[
+            'num_sin'=>$sinistre->numero_sinistre,
+            'status'=>$statut->lib_statut
+        ]));
 
         return response()->json(['success' => true]);
     }
@@ -330,6 +344,19 @@ class ResponsableController extends Controller
             'statut_id' => 4, // exemple : 4 = Refusé
             'motif_refus' => $request->motif
         ]);
+        $statut = Statuts::find(4);
+        $sinistre = Sinistre::findOrFail($expertise->sinistre_id);
+        $gestionnaire = User::findOrFail($sinistre->user_id);
+        try {
+        $gestionnaire->notify(new UserNotification('gestionnaireM', [
+            'num_sin' => $sinistre->numero_sinistre,   // ⚠️ harmonisé
+            'motif'        => $expertise->motif_refus,
+            'status'       => $statut->lib_statut,
+        ]));
+    } catch (\Exception $e) {
+        // Log l'erreur pour debug
+        \Log::error('Erreur lors de l\'envoi de la notification : '.$e->getMessage());
+    }
         return response()->json(['success' => true]);
     }
 

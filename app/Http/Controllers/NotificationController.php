@@ -25,4 +25,22 @@ class NotificationController extends Controller
         $notifications = auth()->user()->notifications()->latest()->paginate(10);
         return view('expert.notifications', compact('notifications', 'title', 'url', 'user'));
     }
+
+    public function showAllResponsable(){
+        $title = "Mon profil";
+        $url='profileExpert';
+        $user = Auth::user();
+  
+        $notifications = auth()->user()->notifications()->latest()->paginate(10);
+        return view('responsable.notifications', compact('notifications', 'title', 'url', 'user'));
+    }
+
+    public function showAllGestionnaire(){
+        $title = "Mon profil";
+        $url='profileExpert';
+        $user = Auth::user();
+  
+        $notifications = auth()->user()->notifications()->latest()->paginate(10);
+        return view('gestionnaires.notifications', compact('notifications', 'title', 'url', 'user'));
+    }
 }

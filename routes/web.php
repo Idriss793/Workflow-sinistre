@@ -51,6 +51,7 @@ Route::middleware('auth')->group(function () {
         Route::put('/updateAssureTiers/{id}', [assureTiersController::class, 'updateAssureTiers'])->name('assureTiers.update');
         Route::post('/storeAssureTiers', [assureTiersController::class, 'storeAssureTiers'])->name('assureTiers.ajouter');
         Route::put('/profileGestionnaire', [SinistreController::class, 'updateProfile'])->name('profileGestionnaire.update');
+        Route::get('/notificationsGestionnaire', [NotificationController::class, 'showAllGestionnaire'])->name('notifications.showAllgestionnaire');
 
 
 
@@ -94,6 +95,12 @@ Route::middleware('auth')->group(function () {
         Route::post('/users', [UserController::class, 'store'])->name('users.store');
         Route::patch('/users/{id}/block', [UserController::class, 'block'])->name('users.block');
         Route::patch('/users/{id}/unblock', [UserController::class, 'unblock'])->name('users.unblock');
+        Route::get('/notificationsResponsable', [NotificationController::class, 'showAllResponsable'])->name('notifications.showAllResponsable');
+        Route::prefix('users')->group(function () {
+            Route::get('/{id}', [UserController::class, 'show'])->name('users.show');
+            Route::post('/{id}/update', [UserController::class, 'update'])->name('users.update');
+            Route::post('/{id}/toggle-active', [UserController::class, 'toggleActive'])->name('users.toggleActive');
+        });
 
 
     });

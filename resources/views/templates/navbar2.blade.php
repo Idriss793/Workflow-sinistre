@@ -151,6 +151,33 @@
             animation: pulse 2s infinite;
         }
 
+        /* Conteneur scrollable pour les notifications */
+        .notification-dropdown {
+            max-height: 350px; /* limite la hauteur */
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #9E1B32 #f1f1f1;
+        }
+
+        /* Pour les navigateurs Webkit (Chrome, Edge, Safari) */
+        .notification-dropdown::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .notification-dropdown::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .notification-dropdown::-webkit-scrollbar-thumb {
+            background: #9E1B32;
+            border-radius: 10px;
+        }
+
+        .notification-dropdown::-webkit-scrollbar-thumb:hover {
+            background: #b7323c;
+        }
+
         @keyframes pulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.1); }
@@ -351,7 +378,7 @@
                             </span>
                         @endif
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end" style="width: 320px;">
+                    <ul class="dropdown-menu dropdown-menu-end notification-dropdown" style="width: 320px;">
                         <li class="dropdown-header d-flex justify-content-between align-items-center">
                             <span><i class="fas fa-bell me-2"></i>Notifications</span>
                             <small class="text-muted">{{auth()->user()->unreadNotifications()->count()}} nouvelle(s)s</small>
@@ -365,11 +392,17 @@
                                             <i class="fas fa-exclamation-triangle text-warning"></i>
                                         </div>
                                         <div class="flex-grow-1 ms-3">
-                                            @if($notification->data['user_type']=='gestionnaire')
-                                                <h6 class="dropdown-header mb-1">Rapport d'expertise automobile disponible</h6>
-                                                <p class="mb-0 text-muted small">Sinistre #{{$notification->data['data']['num_sin']??'-'}}</p>
-                                                <small class="text-muted">{{$notification->created_at->diffForHumans()}}</small>
-                                            @endif
+                                        @if($notification->data['user_type']=='gestionnaire')
+                                            <h6 class="dropdown-header mb-1">Mise a jours du dossier</h6>
+                                            <p class="mb-0 text-muted small">Sinistre #{{$notification->data['data']['num_sin'] ?? '-'}} {{$notification->data['data']['status'] ?? '-'}}</p>
+                                            <small class="text-muted">{{$notification->created_at->diffForHumans()}}</small>
+                                        @elseif($notification->data['user_type']=='gestionnaireM')
+                                            <h6 class="dropdown-header mb-1">Sinistre rejeté</h6>
+                                            <p class="mb-0 text-muted small">Sinistre #{{$notification->data['data']['num_sin'] ?? '-'}}</p>
+                                         
+                                            <small class="text-muted">{{$notification->created_at->diffForHumans()}}</small>
+                                        @endif
+
                                         </div>
                                     </div>
                                 </a>
@@ -377,7 +410,7 @@
                         @endforeach
                            
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item text-center" href="#"><i class="fas fa-eye me-2"></i>Voir toutes les notifications</a></li>
+                        <li><a class="dropdown-item text-center" href="{{ route('notifications.showAllgestionnaire') }}"><i class="fas fa-eye me-2"></i>Voir toutes les notifications</a></li>
                     </ul>
                 </div>
 

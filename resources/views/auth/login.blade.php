@@ -81,6 +81,7 @@
         border-color: #00c6ff;
         box-shadow: 0 0 0 0.2rem rgba(0, 198, 255, 0.25);
         background: rgba(255, 255, 255, 0.05);
+        color: #fff;
     }
 
     .btn-login {
@@ -147,8 +148,7 @@
 
 </style>
 
-<!-- Vidéo ou couleur de fond -->
-<!-- Image ou couleur de fond -->
+
 @if(file_exists(public_path('image/imagefond.jpg')))
     <div class="bg-image" style="background-image: url('{{ asset('image/imagefond.jpg') }}');"></div>
 @else
@@ -167,7 +167,7 @@
 
         <form method="POST" action="{{ route('auth.connection') }}">
             @csrf
-            <input type="text" name="identifier" class="form-control" placeholder="Adresse email ou téléphone" required autofocus
+            <input type="text-white" name="identifier" class="form-control" placeholder="Adresse email ou téléphone" required autofocus
                 value="{{ old('identifier') }}">
             <input type="password" name="password" class="form-control" placeholder="Mot de passe" required>
             <button type="submit" class="btn btn-login">Se connecter</button>
@@ -195,7 +195,5 @@
 </div>
 
 @endsection
-
-
 
 

@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Roles;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -96,17 +98,18 @@ class UserController extends Controller
     }
 
 
-     public function store(Request $request)
+    public function store(Request $request)
     {
         //Validation des données
         $validated = $request->validate([
             'name'         => 'required|string|max:255',
             'first_name'   => 'required|string|max:255',
             'phone_number' => 'required|string|max:20',
-            'email'        => 'required|email|unique:users,email',
+            'email'        => 'required|email|max:255|unique:users,email',
+            'role'         => 'required|string',
             'password'     => 'required|string|min:6',
-            'role'         => 'required|string', // ou 'exists:roles,nom_role' si tu as une table roles
         ]);
+
 
         // Création de l’utilisateur
         $user = User::create([
@@ -114,7 +117,7 @@ class UserController extends Controller
             'first_name'   => $validated['first_name'],
             'phone_number' => $validated['phone_number'],
             'email'        => $validated['email'],
-            'password'     => $validated['password'], // pas de Hash car tu m’as précisé que tu as retiré le cryptage
+            'password'     => Hash::make($validated['password']),
             'role_id'      => $this->getRoleId($validated['role']),
             'is_active'    => 1, // par défaut actif
         ]);
@@ -129,19 +132,14 @@ class UserController extends Controller
      */
     private function getRoleId($roleName)
     {
-        return match (strtolower($roleName)) {
-            'gestionnaire' => 1,
-            'expert'       => 2,
-            'comptable'    => 3,
-            default        => null,
-        };
+        return Roles::where('lib_role', strtolower($roleName))->value('id');
     }
 
     
 
     public function block($id)
     {
-        $user = \App\Models\User::findOrFail($id);
+        $user = User::findOrFail($id);
         $user->is_active = 0;
         $user->save();
 
@@ -150,7 +148,7 @@ class UserController extends Controller
 
     public function unblock($id)
     {
-        $user = \App\Models\User::findOrFail($id);
+        $user = User::findOrFail($id);
         $user->is_active = 1;
         $user->save();
 
@@ -158,5 +156,40 @@ class UserController extends Controller
     }
 
 
+    public function show($id)
+    {
+        $user = User::findOrFail($id);
+        return response()->json($user);
+    }
+
+
+    public function update(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'name'        => 'required|string|max:255',
+            'first_name'  => 'required|string|max:255',
+            'phone_number'=> 'required|string|max:20',
+            'email'       => 'required|email|max:255',
+        ]);
+
+        $user = User::findOrFail($id);
+        $user->update($validated);
+
+        return redirect()->back()->with('status', 'Utilisateur modifié avec succès !');
+    }
+
+
+    public function toggleActive($id)
+    {
+        $user = User::findOrFail($id);
+        $user->is_active = !$user->is_active;
+        $user->save();
+
+        return response()->json([
+            'status' => 'success',
+            'active' => $user->is_active,
+            'message' => $user->is_active ? 'Utilisateur activé' : 'Utilisateur désactivé'
+        ]);
+    }
 
 }

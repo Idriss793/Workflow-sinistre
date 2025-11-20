@@ -50,6 +50,11 @@ class UserNotification extends Notification
                 return (new MailMessage)
                     ->subject('Responsable Notification')
                     ->line("Votre action est requise pour le sinistre #{$this->data['num_sin']} {$this->data['status']}.");
+            case 'gestionnaireM':
+                 return (new MailMessage)
+                    ->subject('Responsable Notification')
+                    ->line("Le sinistre #{$this->data['num_sin']} a été {$this->data['status']} pour le motif suivant: {$this->data['motif']}.");
+                    
             default:
                 return (new MailMessage)
                     ->subject('Notification')
